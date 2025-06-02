@@ -1,0 +1,36 @@
+{
+    "name": "biz/school",
+    "alias": "数智校园",
+    "description": "Description...",
+    "type": "library",
+    "keywords": [
+        "bizadmin",
+        "extension",
+        "dict"
+    ],
+    "homepage": "https://github.com/dagasmart/school",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "北京永易",
+            "email": "dagasmart@163.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "dagasmart/bizadmin": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Biz\\School\\": "src/"
+        }
+    },
+    "extra": {
+        "bizadmin": "Biz\\School\\SchoolServiceProvider",
+        "laravel": {
+            "providers": [
+                "Biz\\School\\SchoolServiceProvider"
+            ]
+        }
+    }
+}
