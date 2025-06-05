@@ -7,11 +7,12 @@ use DagaSmart\BizAdmin\Services\AdminService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
+
 /**
  * 基础-学生表
  *
  * @method BizSchoolTeacher getModel()
- * @method BizSchoolTeacher|\Illuminate\Database\Query\Builder query()
+ * @method BizSchoolTeacher|Builder query()
  */
 class BizSchoolTeacherService extends AdminService
 {
@@ -23,4 +24,13 @@ class BizSchoolTeacherService extends AdminService
             $query->select('school_id','staff_id')->orderBy('school_id','asc');
         }]);
     }
+
+    /**
+     * 学校列表
+     */
+    public function schoolData()
+    {
+        return $this->getModel()->schoolData();
+    }
+
 }

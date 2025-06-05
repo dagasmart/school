@@ -2,10 +2,8 @@
 
 namespace Biz\School\Models;
 
-
 use DagaSmart\BizAdmin\Models\BaseModel as Model;
 use Illuminate\Database\Eloquent\Relations\hasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * 基础-学生表
@@ -27,6 +25,15 @@ class BizSchoolTeacher extends Model
             ->with(['school' => function ($query) {
                 $query->select('id','school_name');
             }]);
+    }
+
+    public function schoolData()
+    {
+        return BizSchool::query()->whereNull('deletetime')->pluck('school_name','id');
+//        return BizSchool::query()
+//            ->whereNull('deletetime')
+//            ->select(['id as value','school_name as label'])
+//            ->get();
     }
 
 

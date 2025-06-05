@@ -29,13 +29,16 @@ class BizSchoolTeacherController extends AdminController
             ->affixHeader()
             ->columnsTogglable()
             ->footable(['expand' => 'first'])
+            ->autoFillHeight(true)
             ->columns([
                 amis()->TableColumn('id', 'ID')->sortable()->set('fixed','left'),
                 amis()->TableColumn('name', '老师姓名')->sortable()->searchable()->set('fixed','left'),
-                amis()->TableColumn('bind.school', '所属学校')
-                    ->searchable()
-                    ->set('fixed','left')
-                    ->breakpoint('*'),
+                amis()->TableColumn('school_name', '所属学校')
+                    ->searchable(['type'=>'select', 'searchable'=>true, 'options'=>$this->service->schoolData()])
+                    //->breakpoint('*')
+                    ->set('type','tpl')
+                    ->tpl('${bind[0].school.school_name}')
+                    ->set('fixed','left'),
                 amis()->TableColumn('duties','教师职务')->sortable(),
                 amis()->TableColumn('staff_sn','教师编码')->sortable(),
                 amis()->TableColumn('school_logo', '老师照片')->set('type','images'),
@@ -48,8 +51,7 @@ class BizSchoolTeacherController extends AdminController
 //                    ->set('static',true)
 //                    ->sortable(),
                 amis()->TableColumn('alipay_user_id', '支付宝刷脸账号')->searchable(),
-                amis()->TableColumn('createtime', '创建时间'),
-                amis()->TableColumn('createtime', '更新时间'),
+                amis()->TableColumn('updatetime', '更新时间')->type('datetime')->width(150),
                 $this->rowActions('dialog')->width(100)->align('center')->set('fixed','right')
             ])
             ->affixRow([
