@@ -17,33 +17,62 @@ class BizSchoolStudentController extends AdminController
 	public function list()
 	{
 		$crud = $this->baseCRUD()
-			->filterTogglable(false)
+			->filterTogglable(true)
 			->headerToolbar([
 				$this->createButton('dialog', 'lg'),
 				...$this->baseHeaderToolBar()
 			])
+            ->filter($this->baseFilter()->body([
+                amis()->SelectControl('school_id', '学校')
+                    ->multiple()
+                    ->searchable()
+                    ->options($this->service->getSchoolData())
+                    ->clearable()
+                    ->placeholder('请选择学校...')
+                    ->size('lg'),
+                amis()->Divider(),
+                amis()->TextControl('name', '学生姓名')
+                    ->clearable()
+                    ->placeholder('请输入学生姓名')
+                    ->size('sm'),
+                amis()->TextControl('id_number', '身份证号')
+                    ->clearable()
+                    ->placeholder('请输入学生身份证号')
+                    ->size('md'),
+            ]))
             ->autoFillHeight(true)
             ->columns([
-                amis()->TableColumn('id', 'ID')->sortable(),
-                amis()->TableColumn('name', '姓名')->searchable(),
+                amis()->TableColumn('id', 'ID')->sortable()->fixed('left'),
+                amis()->TableColumn('name', '姓名')->searchable()->fixed('left'),
                 amis()->TableColumn('student_code', '国网学籍号')->searchable(),
                 amis()->TableColumn('school.school_name', '学校')
-                    ->searchable(['name'=>'school_name','type'=>'input-text'])
+                    ->searchable([
+                        'name' => 'school_id',
+                        'type' => 'select',
+                        'multiple' => true,
+                        'searchable' => true,
+                        'options' => $this->service->getSchoolData(),
+                    ])
                     ->width(200),
-                amis()->TableColumn('class_id', '班级'),
+                amis()->TableColumn('class.name', '班级')->width('100px'),
                 amis()->TableColumn('picture', '头像')
-                    ->set('type','image')
+                    ->set('type','avatar')
+                    ->set('src','${picture}')
                     ->set('thumbMode','cover')
                     ->set('enlargeAble',true),
-                amis()->TableColumn('gender', '性别'),
+                amis()->TableColumn('gender', '性别')
+                    ->searchable([
+                        'name' => 'gender',
+                        'type' => 'checkboxes',
+                        'options' => $this->service->getModel()->sexOption(),
+                    ])
+                    ->set('type', 'checkboxes')
+                    ->set('options', $this->service->getModel()->sexOption())
+                    ->set('static', true),
 //				amis()->TableColumn('nation_id', '民族'),
                 amis()->TableColumn('status', '状态'),
-                amis()->TableColumn('id_number', '身份证号'),
-				amis()->TableColumn('mobile', '电话'),
-
-
-
-
+                amis()->TableColumn('id_number', '身份证号')->searchable(),
+				amis()->TableColumn('mobile', '电话')->searchable(),
 //				amis()->TableColumn('parent_mobile', '家长电话'),
 //				amis()->TableColumn('live_school', '是否住校1 是 2否'),
 //				amis()->TableColumn('remark', '备注'),
