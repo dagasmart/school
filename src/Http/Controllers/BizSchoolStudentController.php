@@ -19,7 +19,7 @@ class BizSchoolStudentController extends AdminController
 		$crud = $this->baseCRUD()
 			->filterTogglable(true)
 			->headerToolbar([
-				$this->createButton('dialog', 'lg'),
+				$this->createButton('dialog'),
 				...$this->baseHeaderToolBar()
 			])
             ->filter($this->baseFilter()->body([
@@ -126,7 +126,7 @@ class BizSchoolStudentController extends AdminController
 				amis()->TableColumn('non_payment_num', '未支付订单数量')->sortable(),
 //				amis()->TableColumn('created_at', admin_trans('admin.created_at'))->type('datetime')->sortable(),
 				amis()->TableColumn('updated_at', admin_trans('admin.updated_at'))->type('datetime')->sortable(),
-				$this->rowActions('dialog', 'lg')
+				$this->rowActions('dialog')
                     ->set('align','center')
                     ->set('fixed','right')
                     ->set('width',150)
@@ -137,44 +137,96 @@ class BizSchoolStudentController extends AdminController
 
 	public function form($isEdit = false)
 	{
-		return $this->baseForm()->body([
-			amis()->TextControl('student_code', '国网学籍号'),
-			amis()->TextControl('class_id', '班级id'),
-			amis()->TextControl('school_id', '学校id'),
-			amis()->TextControl('name', '姓名'),
-			amis()->TextControl('picture', '头像'),
-			amis()->TextControl('gender', '性别1男 2女'),
-			amis()->TextControl('nation_id', '民族id'),
-			amis()->TextControl('status', '状态1 正常 2请假'),
-			amis()->TextControl('id_number', '身份证号'),
-			amis()->TextControl('mobile', '电话'),
-			amis()->TextControl('parent_mobile', '家长电话'),
-			amis()->TextControl('live_school', '是否住校1 是 2否'),
-			amis()->TextControl('remark', '备注'),
-			amis()->TextControl('hk', '户口类型'),
-			amis()->TextControl('face_img', '人脸识别照片'),
-			amis()->TextControl('graduate_status', '是否毕业 1是 2否'),
-			amis()->TextControl('food_card_expire', '饭卡过期 1是 2否'),
-			amis()->TextControl('have_face_pay', '已开通刷脸支付 1是2否'),
-			amis()->TextControl('have_pay_photo', '已采集支付照片 1是 2否'),
-			amis()->TextControl('is_free', '是否免缴服务费 1是 2否'),
-			amis()->TextControl('is_pay', '缴费状态 1已缴费 2未缴费'),
-			amis()->TextControl('pay_status', '支付状态：1=正常，2=异常(有待支付订单) , 3禁用拉黑'),
-			amis()->TextControl('pay_status_clock', '黑名单状态锁，防止定时任务刷新状态，0未锁定，1锁定'),
-			amis()->TextControl('pay_status_clock_time', '锁定时间'),
-			amis()->TextControl('enjoy_sponsor', '是否享受资助 1是 2否'),
-			amis()->TextControl('sponsor_money', '资助金额'),
-			amis()->TextControl('send_sponsor_type', '发放方式'),
-			amis()->TextControl('send_sponsor_time', '发放时间'),
-			amis()->TextControl('school_face_pass_status', '校园一脸通行开通状态 OPEN 开通 CLOSE关闭'),
-			amis()->TextControl('school_face_payment_status', '校园一脸通行刷脸支付开通状态 OPEN开通 CLOSE关闭'),
-			amis()->TextControl('school_face_data', '校园一脸通行开通返回的数据'),
-			amis()->TextControl('end_time', '服务费截止时间'),
-			amis()->TextControl('ali_user_id', '刷脸用户id'),
-			amis()->TextControl('alifacepaystatus', '开通刷脸支付 0未开通，1已开通'),
-			amis()->TextControl('alifacepayopertime', '开通刷脸支付时间'),
-			amis()->TextControl('day_maxpay', '日消费限额'),
-			amis()->TextControl('non_payment_num', '未支付订单数量'),
+		return $this->baseForm()->mode('horizontal')->tabs([
+
+            // 基本信息
+            amis()->Tab()->title('基本信息')->body([
+
+                amis()->GroupControl()->mode('horizontal')->body([
+                    amis()->GroupControl()->direction('vertical')->body([
+                        amis()->TextControl('name', '姓名'),
+                        amis()->TextControl('student_code', '国网学籍号'),
+                        amis()->TextControl('id_number', '身份证号'),
+                        amis()->TextControl('school_id', '学校id'),
+                        amis()->TextControl('class_id', '班级id'),
+                    ]),
+                    amis()->GroupControl()->direction('vertical')->body([
+                        amis()->ImageControl('picture')
+                            ->thumbRatio('1:1')
+                            ->thumbMode('cover h-full rounded-md overflow-hidden')
+                            ->className(['overflow-hidden'=>true, 'h-full'=>true])
+                            ->imageClassName([
+                                'w-52'=>true,
+                                'h-64'=>true,
+                                'overflow-hidden'=>true
+                            ])
+                            ->fixedSize()
+                            ->fixedSizeClassName([
+                                'w-52'=>true,
+                                'h-64'=>true,
+                                'overflow-hidden'=>true
+                            ])
+                            ->crop([
+                             'aspectRatio' => '0.81',
+                            ]),
+                    ]),
+                ]),
+                amis()->Divider(),
+                amis()->GroupControl()->mode('horizontal')->body([
+                    amis()->SelectControl('gender', '性别')
+                        ->options([
+                            ['value' => 1, 'label' => '男'],
+                            ['value' => 2, 'label' => '女'],
+                        ]),
+                    amis()->TextControl('nation_id', '民族id'),
+                    amis()->SelectControl('status', '状态')
+                        ->options([
+                            ['value' => 1, 'label' => '正常'],
+                            ['value' => 2, 'label' => '请假'],
+                        ]),
+                ]),
+            ]),
+
+//            // 基本信息
+//            amis()->Tab()->title(admin_trans('admin.code_generators.base_info'))->body([
+//                amis()->GroupControl()->mode('normal')->body([
+//                    amis()->TextControl('mobile', '电话'),
+//                    amis()->TextControl('parent_mobile', '家长电话'),
+//                    amis()->TextControl('live_school', '是否住校1 是 2否'),
+//                    amis()->TextControl('remark', '备注'),
+//                    amis()->TextControl('hk', '户口类型'),
+//                    amis()->TextControl('face_img', '人脸识别照片'),
+//                    amis()->TextControl('graduate_status', '是否毕业 1是 2否'),
+//                    amis()->TextControl('food_card_expire', '饭卡过期 1是 2否'),
+//                    amis()->TextControl('have_face_pay', '已开通刷脸支付 1是2否'),
+//                    amis()->TextControl('have_pay_photo', '已采集支付照片 1是 2否'),
+//                    amis()->TextControl('is_free', '是否免缴服务费 1是 2否'),
+//                ]),
+//            ]),
+//
+//            // 基本信息
+//            amis()->Tab()->title(admin_trans('admin.code_generators.base_info'))->body([
+//                amis()->GroupControl()->mode('normal')->body([
+//                    amis()->TextControl('is_pay', '缴费状态 1已缴费 2未缴费'),
+//                    amis()->TextControl('pay_status', '支付状态：1=正常，2=异常(有待支付订单) , 3禁用拉黑'),
+//                    amis()->TextControl('pay_status_clock', '黑名单状态锁，防止定时任务刷新状态，0未锁定，1锁定'),
+//                    amis()->TextControl('pay_status_clock_time', '锁定时间'),
+//                    amis()->TextControl('enjoy_sponsor', '是否享受资助 1是 2否'),
+//                    amis()->TextControl('sponsor_money', '资助金额'),
+//                    amis()->TextControl('send_sponsor_type', '发放方式'),
+//                    amis()->TextControl('send_sponsor_time', '发放时间'),
+//                    amis()->TextControl('school_face_pass_status', '校园一脸通行开通状态 OPEN 开通 CLOSE关闭'),
+//                    amis()->TextControl('school_face_payment_status', '校园一脸通行刷脸支付开通状态 OPEN开通 CLOSE关闭'),
+//                    amis()->TextControl('school_face_data', '校园一脸通行开通返回的数据'),
+//                    amis()->TextControl('end_time', '服务费截止时间'),
+//                    amis()->TextControl('ali_user_id', '刷脸用户id'),
+//                    amis()->TextControl('alifacepaystatus', '开通刷脸支付 0未开通，1已开通'),
+//                    amis()->TextControl('alifacepayopertime', '开通刷脸支付时间'),
+//                    amis()->TextControl('day_maxpay', '日消费限额'),
+//                    amis()->TextControl('non_payment_num', '未支付订单数量'),
+//                ]),
+//            ]),
+
 		]);
 	}
 
