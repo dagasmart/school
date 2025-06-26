@@ -45,8 +45,14 @@ class BizSchoolController extends AdminController
             ->autoFillHeight(true)
             ->columns([
                 amis()->TableColumn('id', 'ID')->sortable()->set('fixed','left'),
-                amis()->TableColumn('school_code', '学校代码')->sortable()->searchable()->set('fixed','left'),
-                amis()->TableColumn('school_name', '学校名称')->searchable()->set('fixed','left'),
+                amis()->TableColumn('school_code', '学校代码')
+                    ->sortable()
+                    ->searchable()
+                    ->set('fixed','left'),
+                amis()->TableColumn('school_name', '学校名称')
+                    ->searchable()
+                    ->width(200)
+                    ->set('fixed','left'),
                 amis()->TableColumn('area_id', '所属地区id')
                     ->searchable(['name'=>'area_id','type'=>'input-city'])
                     ->quickEdit(['type'=>'input-city','value'=>'${area_id}'])
@@ -56,7 +62,7 @@ class BizSchoolController extends AdminController
                 amis()->TableColumn('contacts_mobile', '联系电话')->searchable(),
                 amis()->TableColumn('contacts_email', '联系邮件')->searchable(),
                 amis()->TableColumn('type', '学校类型'),
-                amis()->TableColumn('map_address', '学校地址')->searchable(),
+                amis()->TableColumn('map_address', '学校地址')->searchable()->width(200),
                 amis()->TableColumn('location', '位置定位'),
                 amis()->TableColumn('register_time', '注册日期')
                     ->width(120)
@@ -72,7 +78,7 @@ class BizSchoolController extends AdminController
 //                    ->width(100)
 //                    ->type('datetime')
 //                    ->sortable(),
-                $this->rowActions('dialog')->width(100)->align('center')->set('fixed','right')
+                $this->rowActions('dialog')->width(200)->align('center')->set('fixed','right')
             ]);
 
 		return $this->baseList($crud);

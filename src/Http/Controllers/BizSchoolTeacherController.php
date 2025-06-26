@@ -41,7 +41,35 @@ class BizSchoolTeacherController extends AdminController
                     ->set('fixed','left'),
                 amis()->TableColumn('duties','教师职务')->sortable(),
                 amis()->TableColumn('staff_sn','教师编码')->sortable(),
-                amis()->TableColumn('school_logo', '老师照片')->set('type','images'),
+                amis()->TableColumn('face_img', '老师照片')
+                    ->set('src','${face_img}')
+                    ->set('type','avatar')
+                    ->set('fit','cover')
+                    ->set('size',60)
+                    ->set('onError','return true;')
+                    ->set('onEvent', [
+                        'click' => [
+                            'actions' => [
+                                [
+                                    'actionType' => 'drawer',
+                                    'drawer' => [
+                                        'title' => false,
+                                        'actions' => [],
+                                        'closeOnEsc' => true, //esc键关闭
+                                        'closeOnOutside' => true, //域外可关闭
+                                        'showCloseButton' => false, //显示关闭
+                                        'body' => [
+                                            amis()->Image()
+                                                ->src('${face_img}')
+                                                ->defaultImage('/admin-assets/no-error.svg')
+                                                ->width('100%')
+                                                ->height('100%'),
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]),
                 amis()->TableColumn('id_number', '身份证号')->searchable(),
                 amis()->TableColumn('mobile', '联系电话')->searchable(),
 //                amis()->TableColumn('area_id', '所属地区id')
@@ -52,7 +80,10 @@ class BizSchoolTeacherController extends AdminController
 //                    ->sortable(),
                 amis()->TableColumn('alipay_user_id', '支付宝刷脸账号')->searchable(),
                 amis()->TableColumn('updatetime', '更新时间')->type('datetime')->width(150),
-                $this->rowActions('dialog')->width(100)->align('center')->set('fixed','right')
+                $this->rowActions('dialog')
+                    ->set('align','center')
+                    ->set('fixed','right')
+                    ->set('width',150)
             ])
             ->affixRow([
                 [

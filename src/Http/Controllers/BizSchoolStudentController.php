@@ -55,11 +55,35 @@ class BizSchoolStudentController extends AdminController
                     ])
                     ->width(200),
                 amis()->TableColumn('class.name', '班级')->width('100px'),
-                amis()->TableColumn('picture', '头像')
+                amis()->TableColumn('face_img', '学生照片')
+                    ->set('src','${face_img}')
                     ->set('type','avatar')
-                    ->set('src','${picture}')
-                    ->set('thumbMode','cover')
-                    ->set('enlargeAble',true),
+                    ->set('fit','cover')
+                    ->set('size',60)
+                    ->set('onError','return true;')
+                    ->set('onEvent', [
+                        'click' => [
+                            'actions' => [
+                                [
+                                    'actionType' => 'drawer',
+                                    'drawer' => [
+                                        'title' => false,
+                                        'actions' => [],
+                                        'closeOnEsc' => true, //esc键关闭
+                                        'closeOnOutside' => true, //域外可关闭
+                                        'showCloseButton' => false, //显示关闭
+                                        'body' => [
+                                            amis()->Image()
+                                                ->src('${face_img}')
+                                                ->defaultImage('/admin-assets/no-error.svg')
+                                                ->width('100%')
+                                                ->height('100%'),
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]),
                 amis()->TableColumn('gender', '性别')
                     ->searchable([
                         'name' => 'gender',
@@ -101,8 +125,11 @@ class BizSchoolStudentController extends AdminController
 //				amis()->TableColumn('day_maxpay', '日消费限额'),
 				amis()->TableColumn('non_payment_num', '未支付订单数量')->sortable(),
 //				amis()->TableColumn('created_at', admin_trans('admin.created_at'))->type('datetime')->sortable(),
-//				amis()->TableColumn('updated_at', admin_trans('admin.updated_at'))->type('datetime')->sortable(),
-				$this->rowActions('dialog', 'lg')->fixed('right')->width(150)
+				amis()->TableColumn('updated_at', admin_trans('admin.updated_at'))->type('datetime')->sortable(),
+				$this->rowActions('dialog', 'lg')
+                    ->set('align','center')
+                    ->set('fixed','right')
+                    ->set('width',150)
 			]);
 
 		return $this->baseList($crud);
