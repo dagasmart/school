@@ -2,6 +2,7 @@
 
 namespace Biz\School\Http\Controllers;
 
+use Biz\School\Enums\Enum;
 use Biz\School\Services\BizSchoolTeacherService;
 use DagaSmart\BizAdmin\Controllers\AdminController;
 use DagaSmart\BizAdmin\Renderers\Form;
@@ -100,23 +101,81 @@ class BizSchoolTeacherController extends AdminController
 		return $this->baseList($crud);
 	}
 
-	public function form($isEdit = false): Form
+    public function form($isEdit = false)
     {
-		return $this->baseForm()->body([
-			amis()->TextControl('school_code', '学校代码'),
-			amis()->TextControl('school_name', '学校名称'),
-			amis()->TextControl('school_logo', '学校标志'),
-			amis()->TextControl('area_id', '所属地区id'),
-			amis()->TextControl('contacts_mobile', '联系电话'),
-			amis()->TextControl('contacts_email', '联系邮件'),
-			amis()->TextControl('type', '学校类型'),
-			amis()->TextControl('map_address', '学校地址'),
-			amis()->TextControl('location', '位置定位'),
-			amis()->TextControl('register_time', '注册日期'),
-			amis()->TextControl('credit_code', '信用代码'),
-			amis()->TextControl('legal_person', '学校法人'),
-		]);
-	}
+        return $this->baseForm()->mode('horizontal')->tabs([
+
+            // 基本信息
+            amis()->Tab()->title('基本信息')->body([
+
+                amis()->GroupControl()->mode('horizontal')->body([
+                    amis()->GroupControl()->direction('vertical')->body([
+                        amis()->TextControl('name', '姓名'),
+                        amis()->TextControl('staff_sn', '教师编码'),
+                        amis()->TextControl('id_number', '身份证号'),
+                        amis()->SelectControl('school_id', '所属学校')
+                            ->options($this->service->schoolData())
+                            ->searchable(),
+                        amis()->TextControl('work_sn', '工号'),
+                    ]),
+                    amis()->GroupControl()->direction('vertical')->body([
+                        amis()->ImageControl('picture')
+                            ->thumbRatio('1:1')
+                            ->thumbMode('cover h-full rounded-md overflow-hidden')
+                            ->className(['overflow-hidden'=>true, 'h-full'=>true])
+                            ->imageClassName([
+                                'w-52'=>true,
+                                'h-64'=>true,
+                                'overflow-hidden'=>true
+                            ])
+                            ->fixedSize()
+                            ->fixedSizeClassName([
+                                'w-52'=>true,
+                                'h-64'=>true,
+                                'overflow-hidden'=>true
+                            ])
+                            ->crop([
+                                'aspectRatio' => '0.81',
+                            ]),
+                    ]),
+                ]),
+                amis()->Divider(),
+                amis()->GroupControl()->mode('horizontal')->body([
+                    amis()->SelectControl('gender', '性别')
+                        ->options(Enum::sex()),
+                    amis()->SelectControl('nation_id', '民族')
+                        ->options(Enum::nation()),
+                    amis()->SelectControl('work_status', '工作状态')
+                        ->options(Enum::WorkStatus),
+                ]),
+                amis()->Divider(),
+                amis()->GroupControl()->mode('horizontal')->body([
+                    amis()->TextControl('duties', '职务'),
+                    amis()->SelectControl('full_teacher', '专职老师')
+                        ->options(Enum::IsFull),
+                    amis()->SelectControl('work_status', '工作状态')
+                        ->options(Enum::WorkStatus),
+                ]),
+            ]),
+
+            // 家庭情况
+            amis()->Tab()->title('家庭情况')->body([
+                amis()->InputCityControl('region', '所在地区')
+                    ->searchable()
+                    ->extractValue(false)
+                    ->required(),
+                amis()->GroupControl()->mode('horizontal')->body([
+                    amis()->TextControl('address', '家庭住址'),
+                    amis()->TextControl('mobile', '联系电话'),
+                ]),
+                amis()->TextControl('address_info', '详细地址')
+                    ->value('${region.province} ${region.city} ${region.district} ${address}')->static(),
+
+                amis()->TextControl('mobile', '家庭成员'),
+            ]),
+
+        ]);
+    }
 
 	public function detail(): Form
     {

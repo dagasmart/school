@@ -4,6 +4,7 @@ namespace Biz\School\Http\Controllers;
 
 use Biz\School\Services\BizSchoolStudentService;
 use DagaSmart\BizAdmin\Controllers\AdminController;
+use DagaSmart\BizAdmin\Renderers\Form;
 
 /**
  * 基础-学生表
@@ -135,7 +136,7 @@ class BizSchoolStudentController extends AdminController
 		return $this->baseList($crud);
 	}
 
-	public function form($isEdit = false)
+	public function form($isEdit = false): Form
 	{
 		return $this->baseForm()->mode('horizontal')->tabs([
 
