@@ -19,6 +19,8 @@ class BizSchoolController extends AdminController
 
 	public function list(): Page
     {
+        dump(admin_user()->toArray());die;
+        //dump($this->service->getModel()->getTable());die;
 		$crud = $this->baseCRUD()
 			->filterTogglable()
 			->headerToolbar([
@@ -111,7 +113,7 @@ class BizSchoolController extends AdminController
                     ]),
 
                     amis()->GroupControl()->direction('vertical')->body([
-                        amis()->ImageControl('school_logo')
+                        amis()->ImageControl('school_logo',false)
                             ->thumbRatio('4:3')
                             ->thumbMode('cover h-full rounded-md overflow-hidden')
                             ->className(['overflow-hidden'=>true, 'h-full'=>true])

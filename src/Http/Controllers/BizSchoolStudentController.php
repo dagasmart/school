@@ -152,7 +152,7 @@ class BizSchoolStudentController extends AdminController
                         amis()->TextControl('class_id', '班级id'),
                     ]),
                     amis()->GroupControl()->direction('vertical')->body([
-                        amis()->ImageControl('picture')
+                        amis()->ImageControl('picture', false)
                             ->thumbRatio('1:1')
                             ->thumbMode('cover h-full rounded-md overflow-hidden')
                             ->className(['overflow-hidden'=>true, 'h-full'=>true])
