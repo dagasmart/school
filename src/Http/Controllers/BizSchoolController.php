@@ -7,6 +7,7 @@ use Biz\School\Services\BizSchoolService;
 use DagaSmart\BizAdmin\Controllers\AdminController;
 use DagaSmart\BizAdmin\Renderers\Form;
 use DagaSmart\BizAdmin\Renderers\Page;
+use DagaSmart\BizAdmin\Support\Cores\AdminPipeline;
 
 /**
  * 基础-学校表
@@ -19,7 +20,7 @@ class BizSchoolController extends AdminController
 
 	public function list(): Page
     {
-        dump(admin_user()->toArray());die;
+        //dump(admin_user()->toArray());die;
         //dump($this->service->getModel()->getTable());die;
 		$crud = $this->baseCRUD()
 			->filterTogglable()
@@ -87,7 +88,12 @@ class BizSchoolController extends AdminController
                     ->width(100)
                     ->type('datetime')
                     ->sortable(),
-                $this->rowActions('dialog')
+                $this->rowActions([
+                    $this->rowAuthButton('drawer', '', '授权'),
+                    $this->rowShowButton(true),
+                    $this->rowEditButton(true),
+                    $this->rowDeleteButton(),
+                ],'dialog')
                     ->set('width', 200)
                     ->set('align', 'center')
                     ->set('fixed', 'right')
@@ -158,22 +164,105 @@ class BizSchoolController extends AdminController
 
 	public function detail()
 	{
-		return $this->baseDetail()->body([
-			amis()->TextControl('id', 'ID')->static(),
-			amis()->TextControl('school_code', '学校代码')->static(),
-			amis()->TextControl('school_name', '学校名称')->static(),
-			amis()->TextControl('school_logo', '学校标志')->static(),
-			amis()->TextControl('area_id', '所属地区id')->static(),
-			amis()->TextControl('contacts_mobile', '联系电话')->static(),
-			amis()->TextControl('contacts_email', '联系邮件')->static(),
-			amis()->TextControl('type', '学校类型')->static(),
-			amis()->TextControl('map_address', '学校地址')->static(),
-			amis()->TextControl('location', '位置定位')->static(),
-			amis()->TextControl('register_time', '注册日期')->static(),
-			amis()->TextControl('credit_code', '信用代码')->static(),
-			amis()->TextControl('legal_person', '学校法人')->static(),
-//			amis()->TextControl('created_at', admin_trans('admin.created_at'))->static(),
-//			amis()->TextControl('updated_at', admin_trans('admin.updated_at'))->static(),
-		]);
+		return $this->baseDetail()->mode('horizontal')->tabs([
+            // 基本信息
+            amis()->Tab()->title('基本信息')->body([
+                amis()->GroupControl()->mode('horizontal')->body([
+                    amis()->GroupControl()->direction('vertical')->body([
+                        amis()->TextControl('school_name', '学校名称'),
+                        amis()->TextControl('school_code', '学校代码'),
+                        amis()->SelectControl('school_nature', '学校性质')
+                            ->options(Enum::Nature),
+                        amis()->SelectControl('school_type', '办学类型')
+                            ->options(Enum::Type),
+                        amis()->TextControl('register_time', '注册日期'),
+                    ]),
+
+                    amis()->GroupControl()->direction('vertical')->body([
+                        amis()->Image()
+                            ->thumbClassName(['overflow-hidden'=>true, 'w-80'=>true, 'h-60'=>true])
+                            ->src('${school_logo}')
+                            ->thumbMode('cover')
+                            ->enlargeAble(),
+                    ]),
+                ]),
+                amis()->Divider(),
+                amis()->GroupControl()->direction('horizontal')->body([
+                    amis()->TextControl('credit_code', '信用代码'),
+                    amis()->TextControl('legal_person', '学校法人'),
+                ]),
+                amis()->Divider(),
+                amis()->GroupControl()->mode('horizontal')->body([
+                    amis()->TextControl('contacts_mobile', '联系电话'),
+                    amis()->TextControl('contacts_email', '联系邮件'),
+                ]),
+                amis()->Divider(),
+                amis()->InputCityControl('region', '所在地区')
+                    ->searchable()
+                    ->extractValue(false)
+                    ->required(),
+                amis()->TextControl('school_address', '学校地址'),
+                amis()->TextControl('school_address_info', '详细地址')
+                    ->value('${region.province} ${region.city} ${region.district} ${school_address}')
+                    ->static(),
+            ]),
+        ])->static();
 	}
+
+
+    /**
+     * 审核按钮
+     * @param bool|string $dialog
+     * @param string $dialogSize
+     * @param string $title
+     * @return mixed
+     */
+    protected function rowAuthButton(bool|string $dialog = false, string $dialogSize = 'md', string $title = ''): mixed
+    {
+        $title  = $title ?: admin_trans('admin.edit');
+        $action = amis()->LinkAction()->link($this->getEditPath());
+
+        if ($dialog) {
+            $form = $this
+                ->authForm(true)
+                ->api('put:/biz/school/${id}/auth')
+                ->redirect('');
+
+            if ($dialog === 'drawer') {
+                $action = amis()->DrawerAction()->drawer(
+                    amis()->Drawer()->closeOnEsc()->closeOnOutside()->title($title)->body($form)->size($dialogSize)
+                );
+            } else {
+                $action = amis()->DialogAction()->dialog(
+                    amis()->Dialog()->title($title)->body($form)->size($dialogSize)
+                );
+            }
+        }
+
+        $action->label($title)->level('link')->visible(admin_user()->administrator());
+
+        return AdminPipeline::handle(AdminPipeline::PIPE_EDIT_ACTION, $action);
+    }
+
+    private function authForm($isEdit = false): Form
+    {
+        return $this->baseForm()->body([
+            amis()->Alert()
+                ->showIcon()
+                ->style([
+                    'padding' => '0.5rem',
+                    'color' => 'var(--colors-brand-6)',
+                    'borderStyle' => 'dashed',
+                    'borderColor' => 'var(--colors-brand-6)',
+                    'backgroundColor' => 'var(--Tree-item-onChekced-bg)',
+                ])
+                ->body('提示：<p>1.授权给角色时，角色下所有用户可以访问；</p><p>2.授权给用户时，只有授权用户可访问。</p>'),
+            amis()->TextControl('id', 'ID')->static(),
+            amis()->TextControl('school_code', '学校代码')->static(),
+            amis()->TagControl('school_name', '学校名称')->static(),
+            amis()->TagControl('school_roles', '授权角色'),
+            amis()->TagControl('school_users', '授权管理员'),
+        ]);
+    }
+
 }
