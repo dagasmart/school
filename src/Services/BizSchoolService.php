@@ -16,6 +16,12 @@ class BizSchoolService extends AdminService
 {
 	protected string $modelName = BizSchool::class;
 
+
+    public function addRelations($query, string $scene = 'list'): void
+    {
+        $query->with('authorize');
+    }
+
     public function sortable($query): void
     {
         if (request()->orderBy && request()->orderDir) {

@@ -20,7 +20,7 @@ class BizSchoolController extends AdminController
 
 	public function list(): Page
     {
-        //dump(admin_user()->toArray());die;
+        //dump(admin_user()->administrator);die;
         //dump($this->service->getModel()->getTable());die;
 		$crud = $this->baseCRUD()
 			->filterTogglable()
@@ -89,11 +89,11 @@ class BizSchoolController extends AdminController
                     ->type('datetime')
                     ->sortable(),
                 $this->rowActions([
-                    $this->rowAuthButton('drawer', '', '授权'),
-                    $this->rowShowButton(true),
-                    $this->rowEditButton(true),
-                    $this->rowDeleteButton(),
-                ],'dialog')
+                        $this->rowAuthButton('drawer', 'md', '授权'),
+                        $this->rowShowButton(true),
+                        $this->rowEditButton(true),
+                        $this->rowDeleteButton(),
+                    ])
                     ->set('width', 200)
                     ->set('align', 'center')
                     ->set('fixed', 'right')
@@ -211,7 +211,7 @@ class BizSchoolController extends AdminController
 
 
     /**
-     * 审核按钮
+     * 授权按钮
      * @param bool|string $dialog
      * @param string $dialogSize
      * @param string $title
@@ -244,7 +244,12 @@ class BizSchoolController extends AdminController
         return AdminPipeline::handle(AdminPipeline::PIPE_EDIT_ACTION, $action);
     }
 
-    private function authForm($isEdit = false): Form
+    /**
+     * 授权表单
+     * @param bool $isEdit
+     * @return Form
+     */
+    private function authForm(bool $isEdit = false): Form
     {
         return $this->baseForm()->body([
             amis()->Alert()
@@ -259,9 +264,18 @@ class BizSchoolController extends AdminController
                 ->body('提示：<p>1.授权给角色时，角色下所有用户可以访问；</p><p>2.授权给用户时，只有授权用户可访问。</p>'),
             amis()->TextControl('id', 'ID')->static(),
             amis()->TextControl('school_code', '学校代码')->static(),
-            amis()->TagControl('school_name', '学校名称')->static(),
-            amis()->TagControl('school_roles', '授权角色'),
-            amis()->TagControl('school_users', '授权管理员'),
+            amis()->TextControl('school_name', '学校名称')->static(),
+            amis()->TreeSelectControl('hook.roles', '授权角色')
+                ->multiple()
+                //->autoCheckChildren(false)
+                //->cascade(false)
+                //->withChildren()
+                ->onlyChildren()
+                ->selectFirst()
+                ->options($this->service->roleOption())
+                ->required(),
+            amis()->TagControl('school_users', '授权管理员')
+                ->options()->visibleOn('${school_roles}'),
         ]);
     }
 
