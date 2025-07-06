@@ -39,7 +39,7 @@ return new class extends Migration
                 $table->string('contacts_email',64)->nullable()->comment('联系邮件');
 
                 $table->string('module', 50)->nullable()->comment('模块');
-                $table->integer('mer_id')->nullable()->comment('商户id');
+                $table->bigInteger('mer_id')->nullable()->comment('商户id');
 
                 $table->timestamps();
                 $table->softDeletes();

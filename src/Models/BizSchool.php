@@ -3,6 +3,9 @@
 namespace Biz\School\Models;
 
 use DagaSmart\BizAdmin\Models\BusModel as Model;
+use DagaSmart\BizAdmin\Models\HookRoles;
+use Illuminate\Support\Collection;
+use Modules\Apis\Models\AdminRole;
 
 /**
  * 基础-学校表
@@ -13,6 +16,8 @@ class BizSchool extends Model
 	protected $table = 'biz_school';
     protected $primaryKey = 'id';
     public $timestamps = false;
+
+    protected $appends = ['authorize'];
 
     public function setRegisterTimeAttribute($value): string
     {
@@ -32,6 +37,12 @@ class BizSchool extends Model
             $value = $app_url . $value;
         }
         return $value;
+    }
+
+    public function getAuthorizeAttribute(): Collection
+    {
+        return HookRoles::query()->pluck('role_id');
+
     }
 
 }

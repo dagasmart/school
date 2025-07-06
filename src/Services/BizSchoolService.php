@@ -19,7 +19,7 @@ class BizSchoolService extends AdminService
 
     public function addRelations($query, string $scene = 'list'): void
     {
-        $query->with('authorize');
+        //$query->with('authorize');
     }
 
     public function sortable($query): void

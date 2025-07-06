@@ -25,7 +25,7 @@ class BizSchoolController extends AdminController
 		$crud = $this->baseCRUD()
 			->filterTogglable()
 			->headerToolbar([
-				$this->createButton('dialog'),
+				$this->createButton()->permission('x'),
 				...$this->baseHeaderToolBar()
 			])
             ->filter($this->baseFilter()->body([
@@ -265,7 +265,7 @@ class BizSchoolController extends AdminController
             amis()->TextControl('id', 'ID')->static(),
             amis()->TextControl('school_code', '学校代码')->static(),
             amis()->TextControl('school_name', '学校名称')->static(),
-            amis()->TreeSelectControl('hook.roles', '授权角色')
+            amis()->TreeSelectControl('authorize.roles', '授权角色')
                 ->multiple()
                 //->autoCheckChildren(false)
                 //->cascade(false)
@@ -273,10 +273,29 @@ class BizSchoolController extends AdminController
                 ->onlyChildren()
                 ->selectFirst()
                 ->options($this->service->roleOption())
+                ->onEvent([
+                    'change' => [
+                        'actions'=> [
+                            [
+                                'actionType' => 'reset',
+                                'componentId' => 'authorize_users',
+                            ]
+                        ]
+                    ]
+                ])
                 ->required(),
-            amis()->TagControl('school_users', '授权管理员')
-                ->options()->visibleOn('${school_roles}'),
+            amis()->SelectControl('authorize.users', '管理员')
+                ->id('authorize_users')
+                ->multiple()
+                ->searchable()
+                ->selectMode('associated')
+                ->leftMode('tree')
+                ->deferApi('#')
+                ->leftOptions($this->service->roleOption(true))
+                ->options($this->service->roleUserOption())
+                ->value(),
         ]);
     }
+
 
 }
