@@ -25,7 +25,7 @@ class BizSchoolController extends AdminController
 		$crud = $this->baseCRUD()
 			->filterTogglable()
 			->headerToolbar([
-				$this->createButton()->permission('x'),
+				$this->createButton(true)->permission('biz.school.create'),
 				...$this->baseHeaderToolBar()
 			])
             ->filter($this->baseFilter()->body([
