@@ -115,7 +115,7 @@ class BizSchoolController extends AdminController
                             ->options(Enum::Nature),
                         amis()->SelectControl('school_type', '办学类型')
                             ->options(Enum::Type),
-                        amis()->TextControl('register_time', '注册日期'),
+                        amis()->DateControl('register_time', '注册日期'),
                     ]),
 
                     amis()->GroupControl()->direction('vertical')->body([
