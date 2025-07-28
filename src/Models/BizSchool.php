@@ -5,7 +5,6 @@ namespace Biz\School\Models;
 use DagaSmart\BizAdmin\Models\BusModel as Model;
 use DagaSmart\BizAdmin\Models\HookRoles;
 use Illuminate\Support\Collection;
-use Modules\Apis\Models\AdminRole;
 
 /**
  * 基础-学校表
@@ -18,6 +17,10 @@ class BizSchool extends Model
     public $timestamps = false;
 
     protected $appends = ['authorize'];
+
+    protected $casts = [
+        'region_info' => 'array',
+    ];
 
     public function setRegisterTimeAttribute($value): string
     {

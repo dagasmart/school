@@ -30,6 +30,7 @@ return new class extends Migration
                 $table->tinyInteger('school_type')->nullable()->comment('办学类型');
                 $table->date('register_time')->nullable()->comment('注册日期');
                 $table->integer('region')->nullable()->comment('所属地区');
+                $table->json('region_info')->nullable()->comment('地区信息');
                 $table->string('school_address',100)->nullable()->comment('学校地址');
                 $table->string('school_address_info',150)->nullable()->comment('详细地址');
                 $table->string('location',100)->nullable()->comment('位置定位');

@@ -20,8 +20,6 @@ class BizSchoolController extends AdminController
 
 	public function list(): Page
     {
-        //dump(admin_user()->administrator);die;
-        //dump($this->service->getModel()->getTable());die;
 		$crud = $this->baseCRUD()
 			->filterTogglable()
 			->headerToolbar([
@@ -153,10 +151,24 @@ class BizSchoolController extends AdminController
                 amis()->InputCityControl('region', '所在地区')
                     ->searchable()
                     ->extractValue(false)
-                    ->required(),
+                    ->required()
+                    ->onEvent([
+                        'change' => [
+                            'actions' => [
+                                [
+                                    'actionType'  => 'setValue',
+                                    'componentId' => 'form_region_info',
+                                    'args'        => [
+                                        'value' => '${value}'
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ]),
+                amis()->HiddenControl('region_info', '地区信息')->id('form_region_info')->static(),
                 amis()->TextControl('school_address', '学校地址'),
                 amis()->TextControl('school_address_info', '详细地址')
-                    ->value('${region.province} ${region.city} ${region.district} ${school_address}')
+                    ->value('${region_info.province} ${region_info.city} ${region_info.district} ${school_address}')
                     ->static(),
             ]),
         ]);
