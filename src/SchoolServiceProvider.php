@@ -2,6 +2,7 @@
 
 namespace Biz\School;
 
+use DagaSmart\BizAdmin\Renderers\Form;
 use DagaSmart\BizAdmin\Renderers\TextControl;
 use DagaSmart\BizAdmin\Extend\ServiceProvider;
 use Exception;
@@ -73,10 +74,10 @@ class SchoolServiceProvider extends ServiceProvider
     }
 
 
-	public function settingForm()
-	{
+	public function settingForm(): Form
+    {
 	    return $this->baseSettingForm()->body([
-            TextControl::make()->name('value')->label('Value')->required(true),
+            TextControl::make()->name('value')->label('Value')->required(),
 	    ]);
 	}
 }
