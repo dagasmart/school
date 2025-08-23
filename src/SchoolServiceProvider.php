@@ -1,6 +1,6 @@
 <?php
 
-namespace Biz\School;
+namespace DagaSmart\School;
 
 use DagaSmart\BizAdmin\Renderers\Form;
 use DagaSmart\BizAdmin\Renderers\TextControl;
@@ -38,13 +38,6 @@ class SchoolServiceProvider extends ServiceProvider
             'url' => '/biz/school/student',
             'url_type' => 1,
             'icon' => 'ph:student-light',
-        ],
-        [
-            'parent' => '基础维护',
-            'title' => '年级管理',
-            'url' => '/biz/school/grade',
-            'url_type' => 1,
-            'icon' => 'eos-icons:package-upgrade-outlined',
         ],
         [
             'parent' => '基础维护',
