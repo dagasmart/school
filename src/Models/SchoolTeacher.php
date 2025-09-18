@@ -1,6 +1,6 @@
 <?php
 
-namespace Biz\School\Models;
+namespace DagaSmart\School\Models;
 
 use DagaSmart\BizAdmin\Models\BizModel as Model;
 use Illuminate\Database\Eloquent\Relations\hasMany;
@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\hasMany;
 /**
  * 基础-学生表
  */
-class BizSchoolTeacher extends Model
+class SchoolTeacher extends Model
 {
 	protected $table = 'fa_school_staff';
     protected $primaryKey = 'id';
@@ -17,7 +17,7 @@ class BizSchoolTeacher extends Model
 
     public function bind(): hasMany
     {
-        return $this->hasMany(BizSchoolTeacherRelation::class, 'staff_id', 'id')
+        return $this->hasMany(SchoolTeacherRelation::class, 'staff_id', 'id')
             ->with(['school' => function ($query) {
                 $query->select('id','school_name');
             }]);
@@ -25,8 +25,8 @@ class BizSchoolTeacher extends Model
 
     public function schoolData()
     {
-        return BizSchool::query()->whereNull('deletetime')->pluck('school_name','id');
-//        return BizSchool::query()
+        return School::query()->whereNull('deletetime')->pluck('school_name','id');
+//        return School::query()
 //            ->whereNull('deletetime')
 //            ->select(['id as value','school_name as label'])
 //            ->get();

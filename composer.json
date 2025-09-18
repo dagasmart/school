@@ -1,5 +1,5 @@
 {
-    "name": "biz/school",
+    "name": "dagasmart/school",
     "alias": "数智校园",
     "description": "Description...",
     "type": "library",
@@ -22,14 +22,14 @@
     },
     "autoload": {
         "psr-4": {
-            "Biz\\School\\": "src/"
+            "DagaSmart\\School\\": "src/"
         }
     },
     "extra": {
-        "bizadmin": "Biz\\School\\SchoolServiceProvider",
+        "bizadmin": "DagaSmart\\School\\SchoolServiceProvider",
         "laravel": {
             "providers": [
-                "Biz\\School\\SchoolServiceProvider"
+                "DagaSmart\\School\\SchoolServiceProvider"
             ]
         }
     }

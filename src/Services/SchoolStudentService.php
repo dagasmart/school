@@ -1,21 +1,21 @@
 <?php
 
-namespace Biz\School\Services;
+namespace DagaSmart\School\Services;
 
-use Biz\School\Models\BizSchool;
-use Biz\School\Models\BizSchoolStudent;
+use DagaSmart\School\Models\School;
+use DagaSmart\School\Models\SchoolStudent;
 use DagaSmart\BizAdmin\Services\AdminService;
 use Illuminate\Database\Query\Builder;
 
 /**
  * 基础-学生表
  *
- * @method BizSchoolStudent getModel()
- * @method BizSchoolStudent|Builder query()
+ * @method SchoolStudent getModel()
+ * @method SchoolStudent|Builder query()
  */
-class BizSchoolStudentService extends AdminService
+class SchoolStudentService extends AdminService
 {
-	protected string $modelName = BizSchoolStudent::class;
+	protected string $modelName = SchoolStudent::class;
 
     public function listQuery()
     {
@@ -49,7 +49,7 @@ class BizSchoolStudentService extends AdminService
 
     public function getSchoolData(): array
     {
-        $model = new BizSchool;
+        $model = new School;
         return $model->query()->whereNull('deletetime')->get(['id as value','school_name as label'])->toArray();
     }
 

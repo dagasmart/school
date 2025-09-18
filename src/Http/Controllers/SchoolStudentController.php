@@ -1,19 +1,19 @@
 <?php
 
-namespace Biz\School\Http\Controllers;
+namespace DagaSmart\School\Http\Controllers;
 
-use Biz\School\Services\BizSchoolStudentService;
+use DagaSmart\School\Services\SchoolStudentService;
 use DagaSmart\BizAdmin\Controllers\AdminController;
 use DagaSmart\BizAdmin\Renderers\Form;
 
 /**
  * 基础-学生表
  *
- * @property BizSchoolStudentService $service
+ * @property SchoolStudentService $service
  */
-class BizSchoolStudentController extends AdminController
+class SchoolStudentController extends AdminController
 {
-	protected string $serviceName = BizSchoolStudentService::class;
+	protected string $serviceName = SchoolStudentService::class;
 
 	public function list()
 	{

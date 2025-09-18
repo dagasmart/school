@@ -1,19 +1,18 @@
 <?php
 
-namespace Biz\School\Models;
+namespace DagaSmart\School\Models;
 
 use DagaSmart\BizAdmin\Models\BizModel as Model;
 
 /**
- * 基础模型
+ * 基础-学段模型
  */
-class BizSchoolNation extends Model
+class SchoolStage extends Model
 {
 
-	protected $table = 'fa_nation';
+	protected $table = 'fa_school_stage';
     protected $primaryKey = 'id';
 
     public $timestamps = false;
-
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Biz\School\Models;
+namespace DagaSmart\School\Models;
 
 
 use DagaSmart\BizAdmin\Models\BizModel as Model;
@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 /**
  * 基础-学生表
  */
-class BizSchoolTeacherRelation extends Model
+class SchoolTeacherRelation extends Model
 {
 	//use SoftDeletes;
 
@@ -20,7 +20,7 @@ class BizSchoolTeacherRelation extends Model
 
     public function school(): HasOne
     {
-        return $this->hasOne(BizSchool::class,  'id','school_id');
+        return $this->hasOne(School::class,  'id','school_id');
     }
 
 

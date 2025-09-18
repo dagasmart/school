@@ -1,6 +1,6 @@
 <?php
 
-namespace Biz\School\Models;
+namespace DagaSmart\School\Models;
 
 
 use DagaSmart\BizAdmin\Models\BizModel as Model;
@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\hasOne;
 /**
  * 基础-学生表
  */
-class BizSchoolStudent extends Model
+class SchoolStudent extends Model
 {
 
 	protected $table = 'fa_school_student';
@@ -26,12 +26,12 @@ class BizSchoolStudent extends Model
 
     public function school(): hasOne
     {
-        return $this->hasOne(BizSchool::class, 'id', 'school_id')->select('id','school_name');
+        return $this->hasOne(School::class, 'id', 'school_id')->select('id','school_name');
     }
 
     public function class(): hasOne
     {
-        return $this->hasOne(BizSchoolClass::class, 'id', 'class_id')->select('id','name');
+        return $this->hasOne(SchoolClass::class, 'id', 'class_id')->select('id','name');
     }
 
 }

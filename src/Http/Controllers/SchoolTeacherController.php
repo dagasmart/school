@@ -1,9 +1,9 @@
 <?php
 
-namespace Biz\School\Http\Controllers;
+namespace DagaSmart\School\Http\Controllers;
 
-use Biz\School\Enums\Enum;
-use Biz\School\Services\BizSchoolTeacherService;
+use DagaSmart\School\Enums\Enum;
+use DagaSmart\School\Services\SchoolTeacherService;
 use DagaSmart\BizAdmin\Controllers\AdminController;
 use DagaSmart\BizAdmin\Renderers\Form;
 use DagaSmart\BizAdmin\Renderers\Page;
@@ -11,11 +11,11 @@ use DagaSmart\BizAdmin\Renderers\Page;
 /**
  * 基础-学校表
  *
- * @property BizSchoolTeacherService $service
+ * @property SchoolTeacherService $service
  */
-class BizSchoolTeacherController extends AdminController
+class SchoolTeacherController extends AdminController
 {
-	protected string $serviceName = BizSchoolTeacherService::class;
+	protected string $serviceName = SchoolTeacherService::class;
 
 	public function list(): Page
     {

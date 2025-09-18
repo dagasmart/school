@@ -1,21 +1,22 @@
 <?php
 
-namespace Biz\School\Services;
+namespace DagaSmart\School\Services;
 
-use Biz\School\Models\BizSchoolClassRoom;
+use DagaSmart\School\Models\SchoolTeacher;
 use DagaSmart\BizAdmin\Services\AdminService;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 
 /**
  * 基础-学生表
  *
- * @method BizSchoolClassRoom getModel()
- * @method BizSchoolClassRoom|Builder query()
+ * @method SchoolTeacher getModel()
+ * @method SchoolTeacher|Builder query()
  */
-class BizSchoolClassRoomService extends AdminService
+class SchoolTeacherService extends AdminService
 {
-	protected string $modelName = BizSchoolClassRoom::class;
+	protected string $modelName = SchoolTeacher::class;
 
     public function listQuery()
     {

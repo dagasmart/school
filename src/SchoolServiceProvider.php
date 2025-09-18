@@ -1,7 +1,8 @@
 <?php
 
-namespace Biz\School;
+namespace DagaSmart\School;
 
+use DagaSmart\BizAdmin\Renderers\Form;
 use DagaSmart\BizAdmin\Renderers\TextControl;
 use DagaSmart\BizAdmin\Extend\ServiceProvider;
 use Exception;
@@ -40,13 +41,6 @@ class SchoolServiceProvider extends ServiceProvider
         ],
         [
             'parent' => '基础维护',
-            'title' => '年级管理',
-            'url' => '/biz/school/grade',
-            'url_type' => 1,
-            'icon' => 'eos-icons:package-upgrade-outlined',
-        ],
-        [
-            'parent' => '基础维护',
             'title' => '班级管理',
             'url' => '/biz/school/classroom',
             'url_type' => 1,
@@ -73,10 +67,10 @@ class SchoolServiceProvider extends ServiceProvider
     }
 
 
-	public function settingForm()
-	{
+	public function settingForm(): Form
+    {
 	    return $this->baseSettingForm()->body([
-            TextControl::make()->name('value')->label('Value')->required(true),
+            TextControl::make()->name('value')->label('Value')->required(),
 	    ]);
 	}
 }

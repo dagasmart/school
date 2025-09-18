@@ -1,20 +1,20 @@
 <?php
 
-namespace Biz\School\Services;
+namespace DagaSmart\School\Services;
 
-use Biz\School\Models\BizSchool;
+use DagaSmart\School\Models\School;
 use DagaSmart\BizAdmin\Services\AdminService;
 use Illuminate\Database\Query\Builder;
 
 /**
  * 基础-学校表
  *
- * @method BizSchool getModel()
- * @method BizSchool|Builder query()
+ * @method School getModel()
+ * @method School|Builder query()
  */
-class BizSchoolService extends AdminService
+class SchoolService extends AdminService
 {
-	protected string $modelName = BizSchool::class;
+	protected string $modelName = School::class;
 
 
     public function addRelations($query, string $scene = 'list'): void
@@ -33,7 +33,11 @@ class BizSchoolService extends AdminService
 
     public function saving(&$data, $primaryKey = ''): void
     {
+        //学段年级
+        $data['school_grade'] = admin_sort($data['school_grade'], 'desc');
+        //地区代码
         $data['region'] = is_array($data['region']) ? $data['region']['code'] : $data['region'];
+        //注册时间
         $data['register_time'] = strtotime($data['register_time']);
     }
 

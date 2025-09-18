@@ -1,6 +1,6 @@
 <?php
 
-namespace Biz\School\Models;
+namespace DagaSmart\School\Models;
 
 use DagaSmart\BizAdmin\Models\BaseModel;
 
