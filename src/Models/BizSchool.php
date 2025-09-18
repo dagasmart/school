@@ -2,14 +2,13 @@
 
 namespace Biz\School\Models;
 
-use DagaSmart\BizAdmin\Models\BusModel as Model;
 use DagaSmart\BizAdmin\Models\HookRoles;
 use Illuminate\Support\Collection;
 
 /**
  * 基础-学校表
  */
-class BizSchool extends Model
+class BizSchool extends SchoolModel
 {
 
 	protected $table = 'biz_school';

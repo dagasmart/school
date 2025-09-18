@@ -29,11 +29,16 @@ enum Enum
         ['label' => '公办学校‌',    'value' => 1],
         ['label' => '民办学校‌',    'value' => 2],
         ['label' => '独立学院‌',    'value' => 3],
-        ['label' => '‌中外合作办学', 'value' => 4],
+        ['label' => '‌中外办学',    'value' => 4],
         ['label' => '私立学校‌',    'value' => 5],
     ];
 
     public const array Type = [
+        ['label' => '九年义务教育', 'value' => 1],
+        ['label' => '十二年一贯制', 'value' => 2],
+    ];
+
+    public const array Stage = [
         ['label' => '幼儿园',  'value' => 1],
         ['label' => '小学',   'value' => 2],
         ['label' => '初级中学','value' => 3],

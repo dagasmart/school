@@ -20,6 +20,7 @@ class BizSchoolController extends AdminController
 
 	public function list(): Page
     {
+        //admin_abort(is_administrator());
 		$crud = $this->baseCRUD()
 			->filterTogglable()
 			->headerToolbar([
@@ -111,9 +112,8 @@ class BizSchoolController extends AdminController
                         amis()->TextControl('school_code', '学校代码'),
                         amis()->SelectControl('school_nature', '学校性质')
                             ->options(Enum::Nature),
-                        amis()->SelectControl('school_type', '办学类型')
-                            ->options(Enum::Type),
                         amis()->DateControl('register_time', '注册日期'),
+                        amis()->TextControl('credit_code', '信用代码'),
                     ]),
 
                     amis()->GroupControl()->direction('vertical')->body([
@@ -139,8 +139,13 @@ class BizSchoolController extends AdminController
                 ]),
                 amis()->Divider(),
                 amis()->GroupControl()->direction('horizontal')->body([
-                    amis()->TextControl('credit_code', '信用代码'),
+                    amis()->SelectControl('school_type', '办学类型')
+                        ->options(Enum::Type),
                     amis()->TextControl('legal_person', '学校法人'),
+                ]),
+                amis()->GroupControl()->mode('horizontal')->body([
+                    amis()->TagControl('school_stage', '教学阶段')
+                        ->options(Enum::Stage),
                 ]),
                 amis()->Divider(),
                 amis()->GroupControl()->mode('horizontal')->body([
@@ -171,6 +176,14 @@ class BizSchoolController extends AdminController
                     ->value('${region_info.province} ${region_info.city} ${region_info.district} ${school_address}')
                     ->static(),
             ]),
+            // 基本信息
+            amis()->Tab()->title('宣传片')->body([
+                amis()->GroupControl()->mode('horizontal')->body([
+                    amis()->Video()
+                        ->src('https://amis.bj.bcebos.com/amis/2019-12/1577157317579/trailer_hd.mp4')
+                        ->poster('https://internal-amis-res.cdn.bcebos.com/images/2019-12/1577157239810/da6376bf988c.png')
+                ]),
+            ])
         ]);
 	}
 
