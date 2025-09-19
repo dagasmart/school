@@ -2,22 +2,21 @@
 
 namespace DagaSmart\School\Models;
 
-use DagaSmart\BizAdmin\Models\BizModel as Model;
 use Illuminate\Database\Eloquent\Relations\hasMany;
 
 /**
- * 基础-学生表
+ * 基础-老师表
  */
 class SchoolTeacher extends Model
 {
-	protected $table = 'fa_school_staff';
+	protected $table = 'biz_school_teacher';
     protected $primaryKey = 'id';
 
     public $timestamps = false;
 
     public function bind(): hasMany
     {
-        return $this->hasMany(SchoolTeacherRelation::class, 'staff_id', 'id')
+        return $this->hasMany(Teacher::class, 'teacher_id', 'id')
             ->with(['school' => function ($query) {
                 $query->select('id','school_name');
             }]);
@@ -25,11 +24,7 @@ class SchoolTeacher extends Model
 
     public function schoolData()
     {
-        return School::query()->whereNull('deletetime')->pluck('school_name','id');
-//        return School::query()
-//            ->whereNull('deletetime')
-//            ->select(['id as value','school_name as label'])
-//            ->get();
+        return School::query()->whereNull('deleted_at')->pluck('school_name','id');
     }
 
 

@@ -2,7 +2,6 @@
 
 namespace DagaSmart\School\Models;
 
-use DagaSmart\BizAdmin\Models\BusModel as Model;
 use Illuminate\Support\Collection;
 
 /**
