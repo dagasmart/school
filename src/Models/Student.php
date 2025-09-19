@@ -1,0 +1,35 @@
+<?php
+
+namespace DagaSmart\School\Models;
+
+
+use Illuminate\Database\Eloquent\Relations\hasOne;
+
+/**
+ * 基础-学生表
+ */
+class Student extends Model
+{
+	protected $table = 'biz_student';
+    protected $primaryKey = 'id';
+
+    public $timestamps = false;
+
+    public $hidden = ['f_idcard2', 'f_code2']; //排除乱码字段
+
+    public function sexOption(): array
+    {
+        return [['value'=>1, 'label'=>'男'], ['value'=>2, 'label'=>'女']];
+    }
+
+    public function school(): hasOne
+    {
+        return $this->hasOne(School::class, 'id', 'school_id')->select('id','school_name');
+    }
+
+    public function class(): hasOne
+    {
+        return $this->hasOne(Classroom::class, 'id', 'class_id')->select('id','name');
+    }
+
+}
