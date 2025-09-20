@@ -13,6 +13,10 @@ class School extends Model
 	protected $table = 'biz_school';
     protected $primaryKey = 'id';
 
+    protected $casts = [
+        'register_time' => 'date',
+    ];
+
     public $timestamps = false;
 
     public $hidden = ['f_idcard2', 'f_code2']; //排除乱码字段

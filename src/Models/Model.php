@@ -3,11 +3,20 @@
 namespace DagaSmart\School\Models;
 
 use DagaSmart\BizAdmin\Models\BaseModel;
+use DagaSmart\BizAdmin\Scopes\ActiveScope;
 
 /**
- *学校基座模型
+ *基座模型
  */
 class Model extends BaseModel
 {
+
     protected $connection = 'school'; // 使用school数据库连接
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new ActiveScope('school'));
+        parent::booted();
+    }
+
 }
