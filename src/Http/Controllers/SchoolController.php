@@ -55,12 +55,14 @@ class SchoolController extends AdminController
                     ->set('fixed','left'),
                 amis()->TableColumn('school_code', '学校代码'),
                 amis()->TableColumn('school_type', '办学类型')
-                    ->searchable(['name' => 'school_type', 'type' => 'select', 'options' => Enum::Type])
+                    //->searchable(['name' => 'school_type', 'type' => 'select', 'options' => Enum::Type])
+                    ->filterable(['options' => Enum::Type])
                     ->set('type', 'select')
                     ->set('options', Enum::Type)
                     ->set('static', true),
                 amis()->TableColumn('school_nature', '学校性质')
-                    ->searchable(['name' => 'school_nature', 'type' => 'select', 'options' => Enum::Nature])
+                    //->searchable(['name' => 'school_nature', 'type' => 'select', 'options' => Enum::Nature])
+                    ->filterable(['options' => Enum::Nature])
                     ->set('type', 'select')
                     ->set('options', Enum::Nature)
                     ->set('static', true),
