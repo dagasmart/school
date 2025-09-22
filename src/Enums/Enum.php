@@ -34,15 +34,15 @@ enum Enum
     ];
 
 
-    public const array Type = [
-        ['label' => '幼儿园',  'value' => 1],
-        ['label' => '小学',   'value' => 2],
-        ['label' => '初级中学','value' => 3],
-        ['label' => '高级中学','value' => 4],
-        ['label' => '职业高中','value' => 5],
-        ['label' => '九年一贯制','value' => 6],
-        ['label' => '十二年一贯制','value' => 7],
-        ['label' => '全龄一贯制','value' => 8],
+    public const array Mode = [
+        ['label' => '幼儿园',  'value' => 10],
+        ['label' => '小学',   'value' => 20],
+        ['label' => '初级中学','value' => 30],
+        ['label' => '高级中学','value' => 40],
+        ['label' => '九年一贯制','value' => 50],
+        ['label' => '十二年一贯制','value' => 60],
+        ['label' => '高职五年一贯制','value' => 80],
+        ['label' => '大学','value' => 90],
     ];
     public const array Grade = [
         ['label' => '幼儿园',  'value' => 10, 'children' => [
@@ -72,12 +72,12 @@ enum Enum
                 ['label' => '高中三年级', 'value' => 43],
             ]
         ],
-        ['label' => '大学', 'value' => 50, 'children' => [
-                ['label' => '大学一年级', 'value' => 51],
-                ['label' => '大学二年级', 'value' => 52],
-                ['label' => '大学三年级', 'value' => 53],
-                ['label' => '大学四年级', 'value' => 54],
-                ['label' => '大学五年级', 'value' => 55],
+        ['label' => '大学', 'value' => 90, 'children' => [
+                ['label' => '大学一年级', 'value' => 91],
+                ['label' => '大学二年级', 'value' => 92],
+                ['label' => '大学三年级', 'value' => 93],
+                ['label' => '大学四年级', 'value' => 94],
+                ['label' => '大学五年级', 'value' => 95],
             ]
         ]
     ];

@@ -27,7 +27,7 @@ return new class extends Migration
                 $table->string('school_name',100)->comment('学校名称');
                 $table->string('school_logo',255)->nullable()->comment('学校标志');
                 $table->tinyInteger('school_nature')->nullable()->comment('学校性质');
-                $table->tinyInteger('school_type')->nullable()->comment('办学类型');
+                $table->tinyInteger('school_mode')->nullable()->comment('办学模式');
                 $table->tinyInteger('school_grade')->nullable()->comment('学段年级');
                 $table->date('register_time')->nullable()->comment('注册日期');
                 $table->integer('region')->nullable()->comment('所属地区');

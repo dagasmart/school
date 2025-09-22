@@ -20,6 +20,7 @@ class SchoolController extends AdminController
 
 	public function list(): Page
     {
+        //dump(array_column(Enum::Grade, 'children','value'));die;
 		$crud = $this->baseCRUD()
 			->filterTogglable()
 			->headerToolbar([
@@ -38,8 +39,8 @@ class SchoolController extends AdminController
                 amis()->SelectControl('school_nature', '学校性质')
                     ->options(Enum::Nature)
                     ->clearable(),
-                amis()->SelectControl('school_type', '办学类型')
-                    ->options(Enum::Type)
+                amis()->SelectControl('school_mode', '办学模式')
+                    ->options(Enum::Mode)
                     ->clearable(),
                 amis()->Divider(),
                 amis()->DateRangeControl('register_time', '注册登记')
@@ -51,14 +52,14 @@ class SchoolController extends AdminController
                 amis()->TableColumn('id', 'ID')->sortable()->set('fixed','left'),
                 amis()->TableColumn('school_name', '学校名称')
                     ->searchable()
-                    ->width(280)
+                    ->width(200)
                     ->set('fixed','left'),
                 amis()->TableColumn('school_code', '学校代码'),
-                amis()->TableColumn('school_type', '办学类型')
-                    //->searchable(['name' => 'school_type', 'type' => 'select', 'options' => Enum::Type])
-                    ->filterable(['options' => Enum::Type])
+                amis()->TableColumn('school_mode', '办学模式')
+                    //->searchable(['name' => 'school_mode', 'type' => 'select', 'options' => Enum::Mode])
+                    ->filterable(['options' => Enum::Mode])
                     ->set('type', 'select')
-                    ->set('options', Enum::Type)
+                    ->set('options', Enum::Mode)
                     ->set('static', true),
                 amis()->TableColumn('school_nature', '学校性质')
                     //->searchable(['name' => 'school_nature', 'type' => 'select', 'options' => Enum::Nature])
@@ -113,8 +114,8 @@ class SchoolController extends AdminController
                         amis()->TextControl('school_code', '学校代码'),
                         amis()->SelectControl('school_nature', '学校性质')
                             ->options(Enum::Nature),
-                        amis()->SelectControl('school_type', '办学类型')
-                            ->options(Enum::Type),
+                        amis()->SelectControl('school_mode', '办学模式')
+                            ->options(Enum::Mode),
                         amis()->DateControl('register_time', '注册日期'),
                     ]),
 
@@ -176,7 +177,7 @@ class SchoolController extends AdminController
             // 学段管理
             amis()->Tab()->title('学段年级')->body([
                 amis()->GroupControl()->mode('horizontal')->body([
-                    amis()->CheckboxesControl('school_grade','学段年级')
+                    amis()->CheckboxesControl('school_grade',null)
                         ->checkAll()
                         ->columnsCount(1)
                         ->options(Enum::Grade)
@@ -196,8 +197,8 @@ class SchoolController extends AdminController
                         amis()->TextControl('school_code', '学校代码'),
                         amis()->SelectControl('school_nature', '学校性质')
                             ->options(Enum::Nature),
-                        amis()->SelectControl('school_type', '办学类型')
-                            ->options(Enum::Type),
+                        amis()->SelectControl('school_mode', '办学模式')
+                            ->options(Enum::Mode),
                         amis()->TextControl('register_time', '注册日期'),
                     ]),
 
