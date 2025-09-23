@@ -2,6 +2,7 @@
 
 namespace DagaSmart\School\Http\Controllers;
 
+use DagaSmart\BizAdmin\Renderers\DialogAction;
 use DagaSmart\School\Enums\Enum;
 use DagaSmart\School\Services\TeacherService;
 use DagaSmart\BizAdmin\Controllers\AdminController;
@@ -23,7 +24,9 @@ class TeacherController extends AdminController
 			->filterTogglable(false)
 			->headerToolbar([
 				$this->createButton('dialog'),
-				...$this->baseHeaderToolBar()
+				...$this->baseHeaderToolBar(),
+                $this->importAction(admin_url('teacher/import')),
+                $this->exportAction(),
 			])
             //->autoFillHeight(true)
             ->autoGenerateFilter()
@@ -33,7 +36,7 @@ class TeacherController extends AdminController
             ->autoFillHeight(true)
             ->columns([
                 amis()->TableColumn('id', 'ID')->sortable()->set('fixed','left'),
-                amis()->TableColumn('name', '老师姓名')->sortable()->searchable()->set('fixed','left'),
+                amis()->TableColumn('teacher_name', '老师姓名')->sortable()->searchable()->set('fixed','left'),
                 amis()->TableColumn('school_name', '所属学校')
                     ->searchable(['type'=>'select', 'searchable'=>true, 'options'=>$this->service->schoolData()])
                     //->breakpoint('*')
@@ -42,6 +45,7 @@ class TeacherController extends AdminController
                     ->set('fixed','left'),
                 amis()->TableColumn('duties','教师职务')->sortable(),
                 amis()->TableColumn('staff_sn','教师编码')->sortable(),
+                amis()->TableColumn('id_card','身份证号')->sortable(),
                 amis()->TableColumn('face_img', '老师照片')
                     ->set('src','${face_img}')
                     ->set('type','avatar')
@@ -193,8 +197,19 @@ class TeacherController extends AdminController
 			amis()->TextControl('register_time', '注册日期')->static(),
 			amis()->TextControl('credit_code', '信用代码')->static(),
 			amis()->TextControl('legal_person', '学校法人')->static(),
-//			amis()->TextControl('created_at', admin_trans('admin.created_at'))->static(),
-//			amis()->TextControl('updated_at', admin_trans('admin.updated_at'))->static(),
+			//amis()->TextControl('created_at', admin_trans('admin.created_at'))->static(),
+			//amis()->TextControl('updated_at', admin_trans('admin.updated_at'))->static(),
 		]);
 	}
+
+    public function importAction($api=null): DialogAction
+    {
+        return amis()->DialogAction()->label('一键导入')->icon('fa fa-upload')->dialog(
+            amis()->Dialog()->title('一键导入')->body(
+                amis()->Form()->mode('normal')->api($api)->body([
+                    amis()->FileControl()->name('file')->required()->drag(),
+                ]),
+            )->actions([])
+        );
+    }
 }
