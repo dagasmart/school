@@ -28,7 +28,6 @@ class TeacherController extends AdminController
                 $this->importAction(admin_url('teacher/import')),
                 $this->exportAction(),
 			])
-            //->autoFillHeight(true)
             ->autoGenerateFilter()
             ->affixHeader()
             ->columnsTogglable()
@@ -37,17 +36,18 @@ class TeacherController extends AdminController
             ->columns([
                 amis()->TableColumn('id', 'ID')->sortable()->set('fixed','left'),
                 amis()->TableColumn('teacher_name', '老师姓名')->sortable()->searchable()->set('fixed','left'),
-                amis()->TableColumn('school_name', '所属学校')
+                amis()->TableColumn('school', '所属学校')
                     ->searchable(['type'=>'select', 'searchable'=>true, 'options'=>$this->service->schoolData()])
                     //->breakpoint('*')
-                    ->set('type','tpl')
-                    ->tpl('${bind[0].school.school_name}')
-                    ->set('fixed','left'),
-                amis()->TableColumn('duties','教师职务')->sortable(),
-                amis()->TableColumn('staff_sn','教师编码')->sortable(),
-                amis()->TableColumn('id_card','身份证号')->sortable(),
-                amis()->TableColumn('face_img', '老师照片')
-                    ->set('src','${face_img}')
+                    ->set('type','input-tag')
+                    ->set('options',$this->service->schoolData())
+                    ->set('fixed','left')
+                    ->set('static', true),
+                amis()->TableColumn('job.job_name','教师职务')->sortable(),
+                amis()->TableColumn('staff_sn','教师编码')->searchable()->sortable(),
+                amis()->TableColumn('id_card','身份证号')->searchable()->sortable(),
+                amis()->TableColumn('avatar', '老师照片')
+                    ->set('src','${avatar}')
                     ->set('type','avatar')
                     ->set('fit','cover')
                     ->set('size',60)
@@ -58,14 +58,14 @@ class TeacherController extends AdminController
                                 [
                                     'actionType' => 'drawer',
                                     'drawer' => [
-                                        'title' => false,
+                                        'title' => '预览',
                                         'actions' => [],
                                         'closeOnEsc' => true, //esc键关闭
                                         'closeOnOutside' => true, //域外可关闭
-                                        'showCloseButton' => false, //显示关闭
+                                        'showCloseButton' => true, //显示关闭
                                         'body' => [
                                             amis()->Image()
-                                                ->src('${face_img}')
+                                                ->src('${avatar}')
                                                 ->defaultImage('/admin-assets/no-error.svg')
                                                 ->width('100%')
                                                 ->height('100%'),
@@ -75,7 +75,6 @@ class TeacherController extends AdminController
                             ]
                         ]
                     ]),
-                amis()->TableColumn('id_number', '身份证号')->searchable(),
                 amis()->TableColumn('mobile', '联系电话')->searchable(),
 //                amis()->TableColumn('area_id', '所属地区id')
 //                    ->searchable(['name'=>'area_id','type'=>'input-city'])
@@ -105,7 +104,7 @@ class TeacherController extends AdminController
 		return $this->baseList($crud);
 	}
 
-    public function form($isEdit = false)
+    public function form($isEdit = false): Form
     {
         return $this->baseForm()->mode('horizontal')->tabs([
 
@@ -114,16 +113,14 @@ class TeacherController extends AdminController
 
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->GroupControl()->direction('vertical')->body([
-                        amis()->TextControl('name', '姓名'),
-                        amis()->TextControl('staff_sn', '教师编码'),
-                        amis()->TextControl('id_number', '身份证号'),
-                        amis()->SelectControl('school_id', '所属学校')
-                            ->options($this->service->schoolData())
-                            ->searchable(),
+                        amis()->TextControl('teacher_name', '姓名'),
+                        amis()->TextControl('teacher_sn', '教师编码'),
+                        amis()->TextControl('id_card', '身份证号'),
+                        amis()->SelectControl('job', '职务'),
                         amis()->TextControl('work_sn', '工号'),
                     ]),
                     amis()->GroupControl()->direction('vertical')->body([
-                        amis()->ImageControl('picture')
+                        amis()->ImageControl('avatar')
                             ->thumbRatio('1:1')
                             ->thumbMode('cover h-full rounded-md overflow-hidden')
                             ->className(['overflow-hidden'=>true, 'h-full'=>true])
@@ -137,12 +134,12 @@ class TeacherController extends AdminController
                                 'w-52'=>true,
                                 'h-64'=>true,
                                 'overflow-hidden'=>true
-                            ])
-                            ->crop([
-                                'aspectRatio' => '0.81',
                             ]),
                     ]),
                 ]),
+                amis()->TagControl('school', '所属学校')
+                    ->options($this->service->schoolData())
+                    ->searchable(),
                 amis()->Divider(),
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->SelectControl('gender', '性别')
@@ -154,7 +151,6 @@ class TeacherController extends AdminController
                 ]),
                 amis()->Divider(),
                 amis()->GroupControl()->mode('horizontal')->body([
-                    amis()->TextControl('duties', '职务'),
                     amis()->SelectControl('full_teacher', '专职老师')
                         ->options(Enum::IsFull),
                     amis()->SelectControl('work_status', '工作状态')
@@ -164,9 +160,9 @@ class TeacherController extends AdminController
 
             // 家庭情况
             amis()->Tab()->title('家庭情况')->body([
-                amis()->InputCityControl('region', '所在地区')
+                amis()->InputCityControl('region_id', '所在地区')
                     ->searchable()
-                    ->extractValue(false)
+                    ->extractValue()
                     ->required(),
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->TextControl('address', '家庭住址'),

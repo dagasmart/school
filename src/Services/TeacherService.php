@@ -17,11 +17,23 @@ class TeacherService extends AdminService
 {
 	protected string $modelName = Teacher::class;
 
-    public function listQuery()
+    public function listQuery(): Builder
     {
-        return $this->query()->with(['bind' => function ($query) {
-            $query->select('school_id','staff_id')->orderBy('school_id','asc');
-        }]);
+        return $this->query()->with('school');
+//        return $this->query()->with(['bind' => function ($query) {
+//            $query->select('school_id','staff_id')->orderBy('school_id','asc');
+//        }]);
+    }
+
+
+    /**
+     * 更新数据
+     */
+    public function update($primaryKey, $data): bool
+    {
+        return admin_transaction(function () use ($primaryKey, $data) {
+            return parent::update($primaryKey, $data);
+        });
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace DagaSmart\School\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\hasMany;
 
 /**
@@ -13,6 +14,24 @@ class SchoolTeacher extends Model
     protected $primaryKey = 'id';
 
     public $timestamps = false;
+
+    /**
+     * 关联到学校
+     * @return BelongsTo
+     */
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class);
+    }
+
+    /**
+     * 关联到老师
+     * @return BelongsTo
+     */
+    public function teacher(): BelongsTo
+    {
+        return $this->belongsTo(Teacher::class);
+    }
 
     public function bind(): hasMany
     {
