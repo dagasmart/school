@@ -14,7 +14,7 @@ class Teacher extends Model
 	protected $table = 'biz_teacher';
     protected $primaryKey = 'id';
 
-    public $timestamps = false;
+    public $timestamps = true;
 
     public function bind(): hasMany
     {

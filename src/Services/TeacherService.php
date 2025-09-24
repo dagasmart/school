@@ -44,4 +44,12 @@ class TeacherService extends AdminService
         return $this->getModel()->schoolData();
     }
 
+    /**
+     * 职务列表
+     */
+    public function jobData()
+    {
+
+    }
+
 }

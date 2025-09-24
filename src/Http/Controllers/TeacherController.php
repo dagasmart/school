@@ -116,8 +116,9 @@ class TeacherController extends AdminController
                         amis()->TextControl('teacher_name', '姓名'),
                         amis()->TextControl('teacher_sn', '教师编码'),
                         amis()->TextControl('id_card', '身份证号'),
-                        amis()->SelectControl('job', '职务'),
                         amis()->TextControl('work_sn', '工号'),
+                        amis()->RadiosControl('sex', '性别')
+                            ->options(Enum::sex()),
                     ]),
                     amis()->GroupControl()->direction('vertical')->body([
                         amis()->ImageControl('avatar')
@@ -137,13 +138,18 @@ class TeacherController extends AdminController
                             ]),
                     ]),
                 ]),
-                amis()->TagControl('school', '所属学校')
+                amis()->TreeSelectControl('job', '职务')
+                    ->options(Enum::job())
+                    ->menuTpl('<div class="flex justify-between"><span>${label}</span><span class="ml-5 bg-gray-200 rounded p-1 text-xs text-white text-center w-full">${tag}</span></div>')
+                    ->multiple()
+                    ->onlyLeaf()
+                    ->searchable(),
+                amis()->SelectControl('school', '所属学校')
                     ->options($this->service->schoolData())
+                    ->multiple()
                     ->searchable(),
                 amis()->Divider(),
                 amis()->GroupControl()->mode('horizontal')->body([
-                    amis()->SelectControl('gender', '性别')
-                        ->options(Enum::sex()),
                     amis()->SelectControl('nation_id', '民族')
                         ->options(Enum::nation()),
                     amis()->SelectControl('work_status', '工作状态')
