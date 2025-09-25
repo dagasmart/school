@@ -140,7 +140,7 @@ class TeacherController extends AdminController
                 ]),
                 amis()->TreeSelectControl('job', '职务')
                     ->options(Enum::job())
-                    ->menuTpl('<div class="flex justify-between"><span>${label}</span><span class="ml-5 bg-gray-200 rounded p-1 text-xs text-white text-center w-full">${tag}</span></div>')
+                    ->menuTpl('<div class="flex justify-between"><span style="color: var(--button-link-default-font-color);">${label}</span><span class="ml-2 rounded p-1 text-xs text-gray-500 text-center w-full">${tag}</span></div>')
                     ->multiple()
                     ->onlyLeaf()
                     ->searchable(),
