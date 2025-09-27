@@ -41,10 +41,18 @@ class TeacherController extends AdminController
                     //->breakpoint('*')
                     ->set('type','input-tag')
                     ->set('options',$this->service->schoolData())
+                    //->set('value', '${ school }')
                     ->set('fixed','left')
                     ->set('static', true),
-                amis()->TableColumn('job.job_name','教师职务')->sortable(),
-                amis()->TableColumn('staff_sn','教师编码')->searchable()->sortable(),
+                amis()->TableColumn('job_id', '教师职务')
+                    ->searchable(['type'=>'tree-select', 'searchable'=>true, 'options'=>$this->service->jobOption()])
+                    ->set('type', 'input-tree')
+                    ->set('options', $this->service->jobOption())
+                    ->set('multiple', true)
+                    ->set('value', '${ job.job_id }')
+                    ->set('width', 150)
+                    ->set('static', true),
+                amis()->TableColumn('teacher_no','教师编码')->searchable()->sortable(),
                 amis()->TableColumn('id_card','身份证号')->searchable()->sortable(),
                 amis()->TableColumn('avatar', '老师照片')
                     ->set('src','${avatar}')
@@ -107,10 +115,8 @@ class TeacherController extends AdminController
     public function form($isEdit = false): Form
     {
         return $this->baseForm()->mode('horizontal')->tabs([
-
             // 基本信息
             amis()->Tab()->title('基本信息')->body([
-
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->GroupControl()->direction('vertical')->body([
                         amis()->TextControl('teacher_name', '姓名'),
@@ -138,16 +144,6 @@ class TeacherController extends AdminController
                             ]),
                     ]),
                 ]),
-                amis()->TreeSelectControl('job', '职务')
-                    ->options(Enum::job())
-                    ->menuTpl('<div class="flex justify-between"><span style="color: var(--button-link-default-font-color);">${label}</span><span class="ml-2 rounded p-1 text-xs text-gray-500 text-center w-full">${tag}</span></div>')
-                    ->multiple()
-                    ->onlyLeaf()
-                    ->searchable(),
-                amis()->SelectControl('school', '所属学校')
-                    ->options($this->service->schoolData())
-                    ->multiple()
-                    ->searchable(),
                 amis()->Divider(),
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->SelectControl('nation_id', '民族')
@@ -163,7 +159,29 @@ class TeacherController extends AdminController
                         ->options(Enum::WorkStatus),
                 ]),
             ]),
-
+            // 家庭情况
+            amis()->Tab()->title('学校信息')->body([
+                amis()->ComboControl('school', false)->items([
+                    amis()->SelectControl('school_id', '学校${index+1}')
+                        ->options($this->service->schoolData())->required(),
+                    amis()->HiddenControl('teacher_id')->value('${id}'),
+                    amis()->TreeSelectControl('job_id', '职务')
+                        ->options($this->service->jobOption())
+                        ->menuTpl('<div class="flex justify-between"><span style="color: var(--button-link-default-font-color);">${label}</span><span class="ml-2 rounded p-1 text-xs text-gray-500 text-center w-full">${tag}</span></div>')
+                        ->multiple()
+                        ->maxTagCount(5)
+                        ->onlyChildren()
+                        ->searchable()
+                        ->required(),
+                ])
+                ->className('border-gray-100 border-dashed')
+                ->mode('horizontal')
+                ->multiLine(false)
+                ->multiple()
+                ->strictMode(false)
+                ->removable()
+                ->required(),
+            ]),
             // 家庭情况
             amis()->Tab()->title('家庭情况')->body([
                 amis()->InputCityControl('region_id', '所在地区')
@@ -179,29 +197,95 @@ class TeacherController extends AdminController
 
                 amis()->TextControl('mobile', '家庭成员'),
             ]),
-
         ]);
     }
 
 	public function detail(): Form
     {
-		return $this->baseDetail()->body([
-			amis()->TextControl('id', 'ID')->static(),
-			amis()->TextControl('school_code', '学校代码')->static(),
-			amis()->TextControl('school_name', '学校名称')->static(),
-			amis()->TextControl('school_logo', '学校标志')->static(),
-			amis()->TextControl('area_id', '所属地区id')->static(),
-			amis()->TextControl('contacts_mobile', '联系电话')->static(),
-			amis()->TextControl('contacts_email', '联系邮件')->static(),
-			amis()->TextControl('type', '学校类型')->static(),
-			amis()->TextControl('map_address', '学校地址')->static(),
-			amis()->TextControl('location', '位置定位')->static(),
-			amis()->TextControl('register_time', '注册日期')->static(),
-			amis()->TextControl('credit_code', '信用代码')->static(),
-			amis()->TextControl('legal_person', '学校法人')->static(),
-			//amis()->TextControl('created_at', admin_trans('admin.created_at'))->static(),
-			//amis()->TextControl('updated_at', admin_trans('admin.updated_at'))->static(),
-		]);
+		return $this->baseDetail()->mode('horizontal')->tabs([
+            // 基本信息
+            amis()->Tab()->title('基本信息')->body([
+                amis()->GroupControl()->mode('horizontal')->body([
+                    amis()->GroupControl()->direction('vertical')->body([
+                        amis()->TextControl('teacher_name', '姓名'),
+                        amis()->TextControl('teacher_sn', '教师编码'),
+                        amis()->TextControl('id_card', '身份证号'),
+                        amis()->TextControl('work_sn', '工号'),
+                        amis()->RadiosControl('sex', '性别')
+                            ->options(Enum::sex()),
+                    ]),
+                    amis()->GroupControl()->direction('vertical')->body([
+                        amis()->ImageControl('avatar')
+                            ->thumbRatio('1:1')
+                            ->thumbMode('cover h-full rounded-md overflow-hidden')
+                            ->className(['overflow-hidden'=>true, 'h-full'=>true])
+                            ->imageClassName([
+                                'w-52'=>true,
+                                'h-64'=>true,
+                                'overflow-hidden'=>true
+                            ])
+                            ->fixedSize()
+                            ->fixedSizeClassName([
+                                'w-52'=>true,
+                                'h-64'=>true,
+                                'overflow-hidden'=>true
+                            ]),
+                    ]),
+                ]),
+                amis()->Divider(),
+                amis()->GroupControl()->mode('horizontal')->body([
+                    amis()->SelectControl('nation_id', '民族')
+                        ->options(Enum::nation()),
+                    amis()->SelectControl('work_status', '工作状态')
+                        ->options(Enum::WorkStatus),
+                ]),
+                amis()->Divider(),
+                amis()->GroupControl()->mode('horizontal')->body([
+                    amis()->SelectControl('full_teacher', '专职老师')
+                        ->options(Enum::IsFull),
+                    amis()->SelectControl('work_status', '工作状态')
+                        ->options(Enum::WorkStatus),
+                ]),
+            ]),
+            // 家庭情况
+            amis()->Tab()->title('学校信息')->body([
+                amis()->ComboControl('school', false)->items([
+                    amis()->SelectControl('school_id', '学校${index+1}')
+                        ->options($this->service->schoolData())->required(),
+                    amis()->HiddenControl('teacher_id')->value('${id}'),
+                    amis()->TreeSelectControl('job_id', '职务')
+                        ->options($this->service->jobOption())
+                        ->menuTpl('<div class="flex justify-between"><span style="color: var(--button-link-default-font-color);">${label}</span><span class="ml-2 rounded p-1 text-xs text-gray-500 text-center w-full">${tag}</span></div>')
+                        ->multiple()
+                        ->maxTagCount(5)
+                        ->onlyChildren()
+                        ->searchable()
+                        ->required(),
+                ])
+                    ->className('border-gray-100 border-dashed')
+                    ->mode('horizontal')
+                    ->multiLine(false)
+                    ->multiple()
+                    ->strictMode(false)
+                    ->removable()
+                    ->required(),
+            ]),
+            // 家庭情况
+            amis()->Tab()->title('家庭情况')->body([
+                amis()->InputCityControl('region_id', '所在地区')
+                    ->searchable()
+                    ->extractValue()
+                    ->required(),
+                amis()->GroupControl()->mode('horizontal')->body([
+                    amis()->TextControl('address', '家庭住址'),
+                    amis()->TextControl('mobile', '联系电话'),
+                ]),
+                amis()->TextControl('address_info', '详细地址')
+                    ->value('${region.province} ${region.city} ${region.district} ${address}')->static(),
+
+                amis()->TextControl('mobile', '家庭成员'),
+            ]),
+        ])->static();
 	}
 
     public function importAction($api=null): DialogAction

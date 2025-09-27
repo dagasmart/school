@@ -2,9 +2,11 @@
 
 namespace DagaSmart\School\Services;
 
+use DagaSmart\School\Models\Job;
 use DagaSmart\School\Models\Teacher;
 use DagaSmart\BizAdmin\Services\AdminService;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Arr;
 
 
 /**
@@ -17,14 +19,36 @@ class TeacherService extends AdminService
 {
 	protected string $modelName = Teacher::class;
 
-    public function listQuery(): Builder
+    public function loadRelations($query): void
     {
-        return $this->query()->with('school');
-//        return $this->query()->with(['bind' => function ($query) {
-//            $query->select('school_id','staff_id')->orderBy('school_id','asc');
-//        }]);
+        //Job::initialize();
+        $query->with(['school','job']);
     }
 
+    public function searchable($query): void
+    {
+        parent::searchable($query);
+        $query->whereHas('school', function (Builder $builder) {
+            $school = request('school');
+            $builder->when($school, function (Builder $builder) use (&$school) {
+                $builder->where('school_id', $school);
+            });
+            $job_id = request('job_id');
+            $builder->when($job_id, function (Builder $builder) use (&$job_id) {
+                $builder->where('job_id', $job_id);
+            });
+        });
+
+    }
+
+    public function sortable($query): void
+    {
+        if (request()->orderBy && request()->orderDir) {
+            $query->orderBy(request()->orderBy, request()->orderDir ?? 'asc');
+        } else {
+            $query->orderBy($this->getModel()->getKeyName(), 'asc');
+        }
+    }
 
     /**
      * 更新数据
@@ -32,6 +56,25 @@ class TeacherService extends AdminService
     public function update($primaryKey, $data): bool
     {
         return admin_transaction(function () use ($primaryKey, $data) {
+            $schoolJobs = [];
+            if ($data['school']) {
+                array_walk($data['school'], function ($item) use (&$schoolJobs) {
+                    $school_id = $item['school_id'];
+                    $teacher_id = $item['teacher_id'];
+                    $jobs = explode(',', $item['job_id']);
+                    array_walk($jobs, function ($value) use (&$schoolJobs, $school_id, $teacher_id) {
+                        $schoolJobs[] = [
+                            'school_id' => $school_id,
+                            'teacher_id' => $teacher_id,
+                            'job_id' => $value
+                        ];
+                    });
+                });
+            }
+            unset($data['school']);
+            $model = $this->getModel()->query()->where(['id' => $data['id']])->first();
+            //$model->jobs()->forceDelete();
+            $model->jobs()->sync($schoolJobs);
             return parent::update($primaryKey, $data);
         });
     }
@@ -39,7 +82,7 @@ class TeacherService extends AdminService
     /**
      * 学校列表
      */
-    public function schoolData()
+    public function schoolData(): \Illuminate\Support\Collection
     {
         return $this->getModel()->schoolData();
     }
@@ -47,9 +90,14 @@ class TeacherService extends AdminService
     /**
      * 职务列表
      */
-    public function jobData()
+    public function jobOption(): array
     {
-
+        $list = Job::query()
+            ->select(admin_raw('*, label_name label, id as value'))
+            ->orderBy('sort')
+            ->get()
+            ->toArray();
+        return array2tree($list, 0);
     }
 
 }
