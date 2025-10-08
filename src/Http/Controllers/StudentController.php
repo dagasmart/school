@@ -2,6 +2,7 @@
 
 namespace DagaSmart\School\Http\Controllers;
 
+use DagaSmart\School\Enums\Enum;
 use DagaSmart\School\Services\StudentService;
 use DagaSmart\BizAdmin\Controllers\AdminController;
 use DagaSmart\BizAdmin\Renderers\Form;
@@ -85,9 +86,9 @@ class StudentController extends AdminController
                             ]
                         ]
                     ]),
-                amis()->TableColumn('gender', '性别')
+                amis()->TableColumn('sex', '性别')
                     ->searchable([
-                        'name' => 'gender',
+                        'name' => 'sex',
                         'type' => 'checkboxes',
                         'options' => $this->service->getModel()->sexOption(),
                     ])
@@ -145,14 +146,23 @@ class StudentController extends AdminController
 
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->GroupControl()->direction('vertical')->body([
-                        amis()->TextControl('name', '姓名'),
-                        amis()->TextControl('student_code', '国网学籍号'),
-                        amis()->TextControl('id_number', '身份证号'),
-                        amis()->TextControl('school_id', '学校id'),
-                        amis()->TextControl('class_id', '班级id'),
+                        amis()->TextControl('name', '姓名')->required(),
+                        amis()->TextControl('id_number', '身份证号')
+                            ->required(),
+                        amis()->HiddenControl('student_code', '国网学籍号')->value('G${id_number}'),
+                        amis()->SelectControl('school_id', '学校')
+                            ->options($this->service->getSchoolData())
+                            ->searchable()
+                            ->required(),
+                        amis()->SelectControl('grade_id', '年级')
+                            ->options(Enum::Grade)
+                            ->selectMode('group')
+                            ->searchable()
+                            ->required(),
+                        amis()->SelectControl('class_id', '班级')->required(),
                     ]),
                     amis()->GroupControl()->direction('vertical')->body([
-                        amis()->ImageControl('picture', false)
+                        amis()->ImageControl('picture')
                             ->thumbRatio('1:1')
                             ->thumbMode('cover h-full rounded-md overflow-hidden')
                             ->className(['overflow-hidden'=>true, 'h-full'=>true])
@@ -175,16 +185,16 @@ class StudentController extends AdminController
                 amis()->Divider(),
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->SelectControl('gender', '性别')
-                        ->options([
-                            ['value' => 1, 'label' => '男'],
-                            ['value' => 2, 'label' => '女'],
-                        ]),
-                    amis()->TextControl('nation_id', '民族id'),
+                        ->options(Enum::sex())
+                        ->required(),
+                    amis()->SelectControl('nation_id', '民族')
+                        ->options(Enum::nation())
+                        ->value(1)
+                        ->required(),
                     amis()->SelectControl('status', '状态')
-                        ->options([
-                            ['value' => 1, 'label' => '正常'],
-                            ['value' => 2, 'label' => '请假'],
-                        ]),
+                        ->options(Enum::StudentState)
+                        ->value(1)
+                        ->required(),
                 ]),
             ]),
 

@@ -90,7 +90,7 @@ class SchoolController extends AdminController
                     ->type('datetime')
                     ->sortable(),
                 $this->rowActions([
-                        $this->rowAuthButton('drawer', 'md', '授权'),
+                        //$this->rowAuthButton('drawer', 'md', '授权'),
                         $this->rowShowButton(true),
                         $this->rowEditButton(true),
                         $this->rowDeleteButton(),

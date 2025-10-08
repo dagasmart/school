@@ -98,15 +98,15 @@ class TeacherController extends AdminController
                     ->set('width',150)
             ])
             ->affixRow([
-                [
-                    'type' => 'text',
-                    'text' => '总计',
-                    "colSpan" => 3,
-                ],
-                [
-                    'type' => 'tpl',
-                    "tpl" => '${rows|pick:mobile|sum}'
-                ]
+//                [
+//                    'type' => 'text',
+//                    'text' => '总计',
+//                    "colSpan" => 3,
+//                ],
+//                [
+//                    'type' => 'tpl',
+//                    "tpl" => '${rows|pick:mobile|sum}'
+//                ]
             ]);
 
 		return $this->baseList($crud);
@@ -197,6 +197,15 @@ class TeacherController extends AdminController
 
                 amis()->TextControl('mobile', '家庭成员'),
             ]),
+        ])->onEvent([
+            'submitSucc' => [
+                'actions' => [
+                    [
+                        'actionType' => 'custom',
+                        'script' => 'window.$owl.refreshAmisPage();'
+                    ],
+                ]
+            ]
         ]);
     }
 

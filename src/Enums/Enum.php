@@ -7,6 +7,14 @@ use DagaSmart\BizAdmin\Enums\Enum as Enums;
 enum Enum
 {
 
+    public const array StudentState = [
+        ['value' => 1, 'label' => '正常'],
+        ['value' => 2, 'label' => '毕业'],
+        ['value' => 3, 'label' => '转学'],
+        ['value' => 4, 'label' => '休学'],
+        ['value' => 5, 'label' => '退学'],
+    ];
+
     public const array WorkStatus = [
         ['value' => 0, 'label' => '未知'],
         ['value' => 1, 'label' => '正常'],
