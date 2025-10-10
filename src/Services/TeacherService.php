@@ -31,11 +31,11 @@ class TeacherService extends AdminService
         $query->whereHas('school', function (Builder $builder) {
             $school = request('school');
             $builder->when($school, function (Builder $builder) use (&$school) {
-                $builder->where('school_id', $school);
+                $builder->whereIn('school_id', explode(',', $school));
             });
             $job_id = request('job_id');
             $builder->when($job_id, function (Builder $builder) use (&$job_id) {
-                $builder->where('job_id', $job_id);
+                $builder->whereIn('job_id', explode(',', $job_id));
             });
         });
 
@@ -47,6 +47,22 @@ class TeacherService extends AdminService
             $query->orderBy(request()->orderBy, request()->orderDir ?? 'asc');
         } else {
             $query->orderBy($this->getModel()->getKeyName(), 'asc');
+        }
+    }
+
+    public function saving(&$data, $primaryKey = ''): void
+    {
+        //地区代码
+        $data['region_id'] = is_array($data['region_id']) ? $data['region_id']['code'] : $data['region_id'];
+        //手机号码
+        $mobile = $data['mobile'] ?? null;
+        if ($mobile && strpos($mobile, '*')) {
+            unset($data['mobile']);
+        }
+        //身份证号
+        $id_card = $data['id_card'] ?? null;
+        if ($id_card && strpos($id_card, '*')) {
+            unset($data['id_card']);
         }
     }
 

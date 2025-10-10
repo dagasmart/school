@@ -20,7 +20,6 @@ class SchoolController extends AdminController
 
 	public function list(): Page
     {
-        //dump(array_column(Enum::Grade, 'children','value'));die;
 		$crud = $this->baseCRUD()
 			->filterTogglable()
 			->headerToolbar([
@@ -118,7 +117,6 @@ class SchoolController extends AdminController
                             ->options(Enum::Mode),
                         amis()->DateControl('register_time', '注册日期'),
                     ]),
-
                     amis()->GroupControl()->direction('vertical')->body([
                         amis()->ImageControl('school_logo',false)
                             ->thumbRatio('4:3')
@@ -168,7 +166,7 @@ class SchoolController extends AdminController
                             ],
                         ],
                     ]),
-                amis()->HiddenControl('region_info', '地区信息')->id('form_region_info')->static(),
+                amis()->HiddenControl('region_info', '地区信息')->id('form_region_info'),
                 amis()->TextControl('school_address', '学校地址'),
                 amis()->TextControl('school_address_info', '详细地址')
                     ->value('${region_info.province} ${region_info.city} ${region_info.district} ${school_address}')

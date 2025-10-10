@@ -14,12 +14,13 @@ class School extends Model
     protected $primaryKey = 'id';
 
     protected $casts = [
+        'region_info' => 'array',
         'register_time' => 'date',
     ];
 
     public $timestamps = false;
 
-    public $hidden = ['f_idcard2', 'f_code2']; //排除乱码字段
+    public $hidden = []; //排除字段
 
     public function sexOption(): array
     {

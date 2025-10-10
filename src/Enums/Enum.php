@@ -150,22 +150,50 @@ enum Enum
         ],
     ];
 
+    /**
+     * 职务
+     * @return array|array[]
+     */
     public static function job(): array
     {
         return Enum::JOB;
     }
 
+    /**
+     * 性别
+     * @return array
+     */
     public static function sex(): array
     {
         return Enums::sex();
     }
 
+    /**
+     * 民族
+     * @return array
+     */
     public static function nation(): array
     {
         return Enums::nation();
     }
 
+    /**
+     * 学段年级
+     * @return array|array[]
+     */
+    public static function grade(): array
+    {
+        return self::Grade;
+    }
 
+    /**
+     * 家庭关系
+     * @return array
+     */
+    public static function family(): array
+    {
+        return Enums::family();
+    }
 
 
 }

@@ -2,10 +2,12 @@
 
 namespace DagaSmart\School\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\hasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Collection;
+
 
 /**
  * 基础-学生表
@@ -14,6 +16,11 @@ class Teacher extends Model
 {
 	protected $table = 'biz_teacher';
     protected $primaryKey = 'id';
+
+    protected $casts = [
+        'region_info' => 'array',
+        'family' => 'array',
+    ];
 
     public $timestamps = true;
 
@@ -68,10 +75,13 @@ class Teacher extends Model
         return $this->HasOne(SchoolTeacherJob::class,
             'teacher_id',
             'id'
-        )->select(admin_raw("teacher_id,string_agg(job_id::varchar, ',') job_id"))->orderBy('job_id')->groupBy(['teacher_id']);
+            )
+            ->select(admin_raw("teacher_id,string_agg(job_id::varchar, ',') job_id"))
+            ->orderBy('job_id')
+            ->groupBy(['teacher_id']);
     }
 
-    public function schoolData(): \Illuminate\Support\Collection
+    public function schoolData(): Collection
     {
         return School::query()->whereNull('deleted_at')->pluck('school_name','id');
     }

@@ -45,7 +45,7 @@ class TeacherController extends AdminController
                     ->set('fixed','left')
                     ->set('static', true),
                 amis()->TableColumn('job_id', '教师职务')
-                    ->searchable(['type'=>'tree-select', 'searchable'=>true, 'options'=>$this->service->jobOption()])
+                    ->searchable(['type'=>'tree-select', 'multiple'=>true, 'searchable'=>true, 'options'=>$this->service->jobOption()])
                     ->set('type', 'input-tree')
                     ->set('options', $this->service->jobOption())
                     ->set('multiple', true)
@@ -91,7 +91,7 @@ class TeacherController extends AdminController
 //                    ->set('static',true)
 //                    ->sortable(),
                 amis()->TableColumn('alipay_user_id', '支付宝刷脸账号')->searchable(),
-                amis()->TableColumn('updatetime', '更新时间')->type('datetime')->width(150),
+                amis()->TableColumn('updated_at', '更新时间')->type('datetime')->width(150),
                 $this->rowActions('dialog')
                     ->set('align','center')
                     ->set('fixed','right')
@@ -159,7 +159,7 @@ class TeacherController extends AdminController
                         ->options(Enum::WorkStatus),
                 ]),
             ]),
-            // 家庭情况
+            // 学校信息
             amis()->Tab()->title('学校信息')->body([
                 amis()->ComboControl('school', false)->items([
                     amis()->SelectControl('school_id', '学校${index+1}')
@@ -186,16 +186,46 @@ class TeacherController extends AdminController
             amis()->Tab()->title('家庭情况')->body([
                 amis()->InputCityControl('region_id', '所在地区')
                     ->searchable()
-                    ->extractValue()
-                    ->required(),
+                    ->extractValue(false)
+                    ->required()
+                    ->onEvent([
+                        'change' => [
+                            'actions' => [
+                                [
+                                    'actionType'  => 'setValue',
+                                    'componentId' => 'form_region_info',
+                                    'args'        => [
+                                        'value' => '${value}'
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ]),
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->TextControl('address', '家庭住址'),
                     amis()->TextControl('mobile', '联系电话'),
                 ]),
+                amis()->HiddenControl('region_info', '地区信息')->id('form_region_info'),
                 amis()->TextControl('address_info', '详细地址')
-                    ->value('${region.province} ${region.city} ${region.district} ${address}')->static(),
-
-                amis()->TextControl('mobile', '家庭成员'),
+                    ->value('${region_info.province} ${region_info.city} ${region_info.district} ${address}')
+                    ->static(),
+                amis()->Divider()->title('家庭成员')->titlePosition('left'),
+                amis()->ComboControl('family', false)->items([
+                    amis()->TextControl('family_name', '${index+1}.姓名')
+                        ->clearable()
+                        ->required(),
+                    amis()->SelectControl('family_ties', '关系')
+                        ->options(Enum::family())
+                        ->clearable()
+                        ->required(),
+                    amis()->TextControl('family_mobile','电话')->clearable(),
+                ])
+                ->className('border-gray-100 border-dashed')
+                ->mode('horizontal')
+                ->multiLine(false)
+                ->multiple()
+                ->strictMode(false)
+                ->removable(),
             ]),
         ])->onEvent([
             'submitSucc' => [
