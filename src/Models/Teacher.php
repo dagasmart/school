@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\hasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 
 
 /**
@@ -30,6 +31,16 @@ class Teacher extends Model
             ->with(['school' => function ($query) {
                 $query->select('id','school_name');
             }]);
+    }
+
+    /**
+     * 头像
+     * @param $value
+     * @return string
+     */
+    public function getAvatarAttribute($value): string
+    {
+        return Storage::url($value);
     }
 
     /**
