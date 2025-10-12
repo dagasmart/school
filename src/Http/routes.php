@@ -2,8 +2,19 @@
 
 use DagaSmart\School\Http\Controllers;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Routing\Router;
 
-Route::resource('biz/school/index', Controllers\SchoolController::class);
-Route::resource('biz/school/teacher', Controllers\TeacherController::class);
-Route::resource('biz/school/student', Controllers\StudentController::class);
-Route::resource('biz/school/classroom', Controllers\ClassroomController::class);
+Route::group([
+    'prefix' => 'biz',
+], function (Router $router) {
+    $router->resource('school/index', Controllers\SchoolController::class);
+    $router->resource('school/teacher', Controllers\TeacherController::class);
+    $router->resource('school/student', Controllers\StudentController::class);
+    $router->resource('school/classroom', Controllers\ClassroomController::class);
+});
+
+//一键导入文件
+Route::post('school/teacher/import', [Controllers\TeacherController::class, 'import']);
+Route::post('school/student/import', [Controllers\StudentController::class, 'import']);
+//删除导入文件
+Route::post('school/common/remove', [Controllers\CommonController::class, 'remove']);

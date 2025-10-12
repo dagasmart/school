@@ -8,6 +8,11 @@ use DagaSmart\School\Services\TeacherService;
 use DagaSmart\BizAdmin\Controllers\AdminController;
 use DagaSmart\BizAdmin\Renderers\Form;
 use DagaSmart\BizAdmin\Renderers\Page;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
+use function Laravel\Prompts\error;
+use function Swow\Utils\success;
 
 /**
  * 基础-学校表
@@ -330,11 +335,61 @@ class TeacherController extends AdminController
     public function importAction($api=null): DialogAction
     {
         return amis()->DialogAction()->label('一键导入')->icon('fa fa-upload')->dialog(
-            amis()->Dialog()->title('一键导入')->body(
+            amis()->Dialog()->title('一键导入-老师')->body([
+                amis()->Action()
+                    ->label('演示模板')
+                    ->level('light')
+                    ->icon('fa fa-wpforms')
+                    ->className('float-right')
+                    ->actionType('saveAs')
+                    ->api(Storage::url('template/teacher.csv')),
+                amis()->Divider()->color('transparent'),
                 amis()->Form()->mode('normal')->api($api)->body([
-                    amis()->FileControl()->name('file')->required()->drag(),
+                    amis()->FileControl()
+                        ->name('file')
+                        ->label('限制只能上传csv文件')
+                        ->accept('.csv')
+                        ->receiver('school/teacher/import')
+                        ->required()
+                        ->drag()
+                        ->onEvent([
+                            'remove' => [
+                                'actions' => [
+                                    [
+                                        'actionType' => 'ajax',
+                                        'api' => [
+                                            'url' => 'school/common/remove',
+                                            'method' => 'post',
+                                            'data' => [
+                                                'path' => '${event.data.value}'
+                                            ],
+                                            'silent' => true
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]),
                 ]),
-            )->actions([])
+            ])->actions([])
         );
     }
+
+    public function import(): JsonResponse|JsonResource
+    {
+        // 验证文件是否存在且不为空
+        if (request()->hasFile('file') && request()->file('file')->isValid()) {
+            $file = request()->file('file');
+            $filename = time() . $file->getClientOriginalName(); // 使用时间戳和原始名称作为文件名
+            $path = $file->storeAs('files', $filename, 'public'); // 存储到 public 磁盘的 uploads 目录下
+
+            $data = fastexcel()->import(public_storage_path($path));
+
+            print_r($data->toArray());die;
+
+            return $this->response()->success(['value' => $path], '文件上传成功！'); // 返回成功消息
+        } else {
+            return $this->response()->fail('文件上传失败！');
+        }
+    }
+
 }

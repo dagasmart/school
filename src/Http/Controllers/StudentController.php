@@ -2,10 +2,14 @@
 
 namespace DagaSmart\School\Http\Controllers;
 
+use DagaSmart\BizAdmin\Renderers\DialogAction;
 use DagaSmart\School\Enums\Enum;
 use DagaSmart\School\Services\StudentService;
 use DagaSmart\BizAdmin\Controllers\AdminController;
 use DagaSmart\BizAdmin\Renderers\Form;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * 基础-学生表
@@ -19,10 +23,12 @@ class StudentController extends AdminController
 	public function list()
 	{
 		$crud = $this->baseCRUD()
-			->filterTogglable(true)
+			->filterTogglable()
 			->headerToolbar([
 				$this->createButton('dialog'),
-				...$this->baseHeaderToolBar()
+				...$this->baseHeaderToolBar(),
+                $this->importAction(admin_url('student/import')),
+                $this->exportAction(),
 			])
             ->filter($this->baseFilter()->body([
                 amis()->SelectControl('school_id', '学校')
@@ -95,38 +101,10 @@ class StudentController extends AdminController
                     ->set('type', 'checkboxes')
                     ->set('options', $this->service->getModel()->sexOption())
                     ->set('static', true),
-//				amis()->TableColumn('nation_id', '民族'),
                 amis()->TableColumn('status', '状态'),
                 amis()->TableColumn('id_number', '身份证号')->searchable(),
 				amis()->TableColumn('mobile', '电话')->searchable(),
-//				amis()->TableColumn('parent_mobile', '家长电话'),
-//				amis()->TableColumn('live_school', '是否住校1 是 2否'),
-//				amis()->TableColumn('remark', '备注'),
-//				amis()->TableColumn('hk', '户口类型')->sortable(),
-//				amis()->TableColumn('face_img', '人脸识别照片'),
-//				amis()->TableColumn('graduate_status', '是否毕业 1是 2否'),
-//				amis()->TableColumn('food_card_expire', '饭卡过期 1是 2否'),
-//				amis()->TableColumn('have_face_pay', '已开通刷脸支付 1是2否'),
-//				amis()->TableColumn('have_pay_photo', '已采集支付照片 1是 2否'),
-//				amis()->TableColumn('is_free', '是否免缴服务费 1是 2否'),
-//				amis()->TableColumn('is_pay', '缴费状态 1已缴费 2未缴费'),
-//				amis()->TableColumn('pay_status', '支付状态：1=正常，2=异常(有待支付订单) , 3禁用拉黑'),
-//				amis()->TableColumn('pay_status_clock', '黑名单状态锁，防止定时任务刷新状态，0未锁定，1锁定')->sortable(),
-//				amis()->TableColumn('pay_status_clock_time', '锁定时间')->sortable(),
-//				amis()->TableColumn('enjoy_sponsor', '是否享受资助 1是 2否'),
-//				amis()->TableColumn('sponsor_money', '资助金额'),
-//				amis()->TableColumn('send_sponsor_type', '发放方式'),
-//				amis()->TableColumn('send_sponsor_time', '发放时间')->sortable(),
-//				amis()->TableColumn('school_face_pass_status', '校园一脸通行开通状态 OPEN 开通 CLOSE关闭'),
-//				amis()->TableColumn('school_face_payment_status', '校园一脸通行刷脸支付开通状态 OPEN开通 CLOSE关闭'),
-//				amis()->TableColumn('school_face_data', '校园一脸通行开通返回的数据'),
-//				amis()->TableColumn('end_time', '服务费截止时间'),
-//				amis()->TableColumn('ali_user_id', '刷脸用户id'),
-//				amis()->TableColumn('alifacepaystatus', '开通刷脸支付 0未开通，1已开通'),
-//				amis()->TableColumn('alifacepayopertime', '开通刷脸支付时间')->sortable(),
-//				amis()->TableColumn('day_maxpay', '日消费限额'),
 				amis()->TableColumn('non_payment_num', '未支付订单数量')->sortable(),
-//				amis()->TableColumn('created_at', admin_trans('admin.created_at'))->type('datetime')->sortable(),
 				amis()->TableColumn('updated_at', admin_trans('admin.updated_at'))->type('datetime')->sortable(),
 				$this->rowActions('dialog')
                     ->set('align','center')
@@ -286,4 +264,59 @@ class StudentController extends AdminController
 			amis()->TextControl('updated_at', admin_trans('admin.updated_at'))->static(),
 		]);
 	}
+
+    public function importAction($api=null): DialogAction
+    {
+        return amis()->DialogAction()->label('一键导入')->icon('fa fa-upload')->dialog(
+            amis()->Dialog()->title('一键导入-学生')->body([
+                amis()->Action()
+                    ->label('演示模板')
+                    ->level('light')
+                    ->icon('fa fa-wpforms')
+                    ->className('float-right')
+                    ->actionType('saveAs')
+                    ->api(Storage::url('template/student.csv')),
+                amis()->Divider()->color('transparent'),
+                amis()->Form()->mode('normal')->api($api)->body([
+                    amis()->FileControl()
+                        ->name('file')
+                        ->label('限制只能上传csv文件')
+                        ->accept('.csv')
+                        ->receiver('school/student/import')
+                        ->required()
+                        ->drag()
+                        ->onEvent([
+                            'remove' => [
+                                'actions' => [
+                                    [
+                                        'actionType' => 'ajax',
+                                        'api' => [
+                                            'url' => 'school/common/remove',
+                                            'method' => 'post',
+                                            'data' => [
+                                                'path' => '${event.data.value}'
+                                            ],
+                                            'silent' => true
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]),
+                ]),
+            ])->actions([])
+        );
+    }
+
+    public function import(): JsonResponse|JsonResource
+    {
+        // 验证文件是否存在且不为空
+        if (request()->hasFile('file') && request()->file('file')->isValid()) {
+            $file = request()->file('file');
+            $filename = str_replace('.', '', microtime(true)) . $file->getClientOriginalName(); // 使用时间戳和原始名称作为文件名
+            $path = $file->storeAs('files', $filename, 'public'); // 存储到 public 磁盘的 uploads 目录下
+            return $this->response()->success(['value' => $path], '文件上传成功！'); // 返回成功消息
+        } else {
+            return $this->response()->fail('文件上传失败！');
+        }
+    }
 }
