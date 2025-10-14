@@ -337,7 +337,7 @@ class TeacherController extends AdminController
         ])->static();
 	}
 
-    public function importAction($api=null): DialogAction
+    public function importAction($api = null): DialogAction
     {
         return amis()->DialogAction()->label('一键导入')->icon('fa fa-upload')->dialog(
             amis()->Dialog()->title('一键导入-老师')->body([
@@ -355,6 +355,9 @@ class TeacherController extends AdminController
                         ->label('限制只能上传csv文件')
                         ->accept('.csv')
                         ->receiver('school/teacher/import')
+                        //->startChunkApi('school/teacher/import')
+                        //->chunkApi('school/teacher/import')
+                        ->finishChunkApi('school/teacher/importChunk')
                         ->required()
                         ->drag()
                         ->onEvent([
@@ -379,6 +382,37 @@ class TeacherController extends AdminController
         );
     }
 
+    public function importChunk(): JsonResponse|JsonResource
+    {
+        $fileName = request('filename');
+        $partList = request('partList');
+        $uploadId = request('uploadId');
+        $type     = request('t', 'uploads');
+        $ext      = pathinfo($fileName, PATHINFO_EXTENSION);
+        $path     = $type . '/' . $uploadId . '.' . $ext;
+        $fullPath = storage_path('app/public/' . $path);
+        make_dir(dirname($fullPath));
+        for ($i = 0; $i < count($partList); $i++) {
+            $partNumber = $partList[$i]['partNumber'];
+            $eTag       = $partList[$i]['eTag'];
+            $partPath = 'chunk/' . $uploadId . '/' . $partNumber;
+            $partETag = md5(Storage::disk('public')->get($partPath));
+            if ($eTag != $partETag) {
+                return $this->response()->fail('分片上传失败');
+            }
+            file_put_contents($fullPath, Storage::disk('public')->get($partPath), FILE_APPEND);
+        }
+        clearstatcache();
+        app('files')->deleteDirectory(storage_path('app/public/chunk/' . $uploadId));
+
+        foreach ($this->readCsv(public_storage_path($path)) as $i => $item) {
+            echo  $i . '行' . json_encode($item, JSON_UNESCAPED_UNICODE) . PHP_EOL;
+        }
+        die;
+
+        return $this->response()->success(['value' => $path], '上传成功');
+    }
+
     public function import(): JsonResponse|JsonResource
     {
         //try {
@@ -387,17 +421,10 @@ class TeacherController extends AdminController
                 $file = request()->file('file');
                 $filename = time() . $file->getClientOriginalName(); // 使用时间戳和原始名称作为文件名
                 $path = $file->storeAs('files', $filename, 'public'); // 存储到 public 磁盘的 uploads 目录下
-                //$splFileObject = new SplFileObject(str_replace('\\', '/' ,public_storage_path($path)), 'rb');
-                //$fileRead = new SplFileObject(public_storage_path($path));
-                //foreach ($fileRead as $line) {
-                //    var_export($line);
-                //}
-
                 foreach ($this->readCsv(public_storage_path($path)) as $i => $item) {
                     echo  $i . '行' . json_encode($item, JSON_UNESCAPED_UNICODE) . PHP_EOL;
                 }
                 die;
-
                 return $this->response()->success(['value' => $path], '文件上传成功！'); // 返回成功消息
             } else {
                 return $this->response()->fail('文件上传失败！');
@@ -405,53 +432,31 @@ class TeacherController extends AdminController
         //} catch (\Exception $e) {
             //return $this->response()->fail('文件上传失败！');
         //}
-
     }
 
 
     public function readCsv($filePath): \Generator
     {
-//        $handle = fopen($filePath, 'r');
-//        while (!feof($handle)) {
-//            yield fgetcsv($handle);
-//        }
-//        fclose($handle);
-
-//        $file = new SplFileObject($filePath);
-//        $file->setFlags(SplFileObject::READ_CSV);
-//        $file->setCsvControl(',');
-//
-//        foreach ($file as $line) {
-//            // 处理每一行的数据
-//            yield $line;
-//        }
-
-//        $rows = SimpleExcelReader::create($filePath)->getRows();
-//
-//        foreach ($rows as $line) {
-//            // 处理每一行的数据
-//            yield $line;
-//        }
         $errors = [];
         $rows = SimpleExcelReader::create($filePath)
             //->noHeaderRow() //不要键名
             ->getRows()
             ->filter(function(array $rowProperties) use(&$errors) {
-                $msg = '';
-                if (!$rowProperties['region_id']) {
-                    $msg .= $rowProperties['region_id'] . '_地区为空';
-                }
-                if (!$rowProperties['avatar']) {
-                    $msg .= $rowProperties['avatar'] . '_头像为空';
-                };
-                $errors[] = $msg ? $rowProperties['teacher_name'] . $msg : '';
-
-                return !in_array($rowProperties['teacher_name'], ['孙永刚','王文平','方勇勤']);
+//                $msg = '';
+//                if (!$rowProperties['region_id']) {
+//                    $msg .= $rowProperties['region_id'] . '_地区为空';
+//                }
+//                if (!$rowProperties['avatar']) {
+//                    $msg .= $rowProperties['avatar'] . '_头像为空';
+//                };
+//                $errors[] = $msg ? $rowProperties['teacher_name'] . $msg : '';
+//
+//                return !in_array($rowProperties['teacher_name'], ['孙永刚','王文平','方勇勤']);
             })
             ->each(function(array $rowProperties) {
                 return $rowProperties;
             });
-        yield $errors;
+        yield $rows;
 
 
     }

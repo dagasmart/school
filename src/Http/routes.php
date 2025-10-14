@@ -16,5 +16,7 @@ Route::group([
 //一键导入文件
 Route::post('school/teacher/import', [Controllers\TeacherController::class, 'import']);
 Route::post('school/student/import', [Controllers\StudentController::class, 'import']);
+Route::post('school/teacher/importChunk', [Controllers\TeacherController::class, 'importChunk']);
+
 //删除导入文件
 Route::post('school/common/remove', [Controllers\CommonController::class, 'remove']);
