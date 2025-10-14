@@ -11,6 +11,11 @@ use DagaSmart\BizAdmin\Renderers\Page;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
+use OpenSpout\Common\Exception\IOException;
+use OpenSpout\Common\Exception\UnsupportedTypeException;
+use OpenSpout\Reader\Exception\ReaderNotOpenedException;
+use Spatie\SimpleExcel\SimpleExcelReader;
+use SplFileObject;
 use function Laravel\Prompts\error;
 use function Swow\Utils\success;
 
@@ -376,20 +381,79 @@ class TeacherController extends AdminController
 
     public function import(): JsonResponse|JsonResource
     {
-        // 验证文件是否存在且不为空
-        if (request()->hasFile('file') && request()->file('file')->isValid()) {
-            $file = request()->file('file');
-            $filename = time() . $file->getClientOriginalName(); // 使用时间戳和原始名称作为文件名
-            $path = $file->storeAs('files', $filename, 'public'); // 存储到 public 磁盘的 uploads 目录下
+        //try {
+            // 验证文件是否存在且不为空
+            if (request()->hasFile('file') && request()->file('file')->isValid()) {
+                $file = request()->file('file');
+                $filename = time() . $file->getClientOriginalName(); // 使用时间戳和原始名称作为文件名
+                $path = $file->storeAs('files', $filename, 'public'); // 存储到 public 磁盘的 uploads 目录下
+                //$splFileObject = new SplFileObject(str_replace('\\', '/' ,public_storage_path($path)), 'rb');
+                //$fileRead = new SplFileObject(public_storage_path($path));
+                //foreach ($fileRead as $line) {
+                //    var_export($line);
+                //}
 
-            $data = fastexcel()->import(public_storage_path($path));
+                foreach ($this->readCsv(public_storage_path($path)) as $i => $item) {
+                    echo  $i . '行' . json_encode($item, JSON_UNESCAPED_UNICODE) . PHP_EOL;
+                }
+                die;
 
-            print_r($data->toArray());die;
+                return $this->response()->success(['value' => $path], '文件上传成功！'); // 返回成功消息
+            } else {
+                return $this->response()->fail('文件上传失败！');
+            }
+        //} catch (\Exception $e) {
+            //return $this->response()->fail('文件上传失败！');
+        //}
 
-            return $this->response()->success(['value' => $path], '文件上传成功！'); // 返回成功消息
-        } else {
-            return $this->response()->fail('文件上传失败！');
-        }
+    }
+
+
+    public function readCsv($filePath): \Generator
+    {
+//        $handle = fopen($filePath, 'r');
+//        while (!feof($handle)) {
+//            yield fgetcsv($handle);
+//        }
+//        fclose($handle);
+
+//        $file = new SplFileObject($filePath);
+//        $file->setFlags(SplFileObject::READ_CSV);
+//        $file->setCsvControl(',');
+//
+//        foreach ($file as $line) {
+//            // 处理每一行的数据
+//            yield $line;
+//        }
+
+//        $rows = SimpleExcelReader::create($filePath)->getRows();
+//
+//        foreach ($rows as $line) {
+//            // 处理每一行的数据
+//            yield $line;
+//        }
+        $errors = [];
+        $rows = SimpleExcelReader::create($filePath)
+            //->noHeaderRow() //不要键名
+            ->getRows()
+            ->filter(function(array $rowProperties) use(&$errors) {
+                $msg = '';
+                if (!$rowProperties['region_id']) {
+                    $msg .= $rowProperties['region_id'] . '_地区为空';
+                }
+                if (!$rowProperties['avatar']) {
+                    $msg .= $rowProperties['avatar'] . '_头像为空';
+                };
+                $errors[] = $msg ? $rowProperties['teacher_name'] . $msg : '';
+
+                return !in_array($rowProperties['teacher_name'], ['孙永刚','王文平','方勇勤']);
+            })
+            ->each(function(array $rowProperties) {
+                return $rowProperties;
+            });
+        yield $errors;
+
+
     }
 
 }
