@@ -8,6 +8,7 @@ use DagaSmart\School\Services\TeacherService;
 use DagaSmart\BizAdmin\Controllers\AdminController;
 use DagaSmart\BizAdmin\Renderers\Form;
 use DagaSmart\BizAdmin\Renderers\Page;
+use Fiber;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
@@ -16,6 +17,8 @@ use OpenSpout\Common\Exception\UnsupportedTypeException;
 use OpenSpout\Reader\Exception\ReaderNotOpenedException;
 use Spatie\SimpleExcel\SimpleExcelReader;
 use SplFileObject;
+use Swow\Coroutine;
+use Swow\Sync\WaitGroup;
 use function Laravel\Prompts\error;
 use function Swow\Utils\success;
 
@@ -404,12 +407,11 @@ class TeacherController extends AdminController
         }
         clearstatcache();
         app('files')->deleteDirectory(storage_path('app/public/chunk/' . $uploadId));
-
-        foreach ($this->readCsv(public_storage_path($path)) as $i => $item) {
+        foreach ($this->readCsv($fullPath) as $i => $item) {
             echo  $i . '行' . json_encode($item, JSON_UNESCAPED_UNICODE) . PHP_EOL;
+            //ob_end_clean(); //清除缓存
         }
         die;
-
         return $this->response()->success(['value' => $path], '上传成功');
     }
 
@@ -424,7 +426,6 @@ class TeacherController extends AdminController
                 foreach ($this->readCsv(public_storage_path($path)) as $i => $item) {
                     echo  $i . '行' . json_encode($item, JSON_UNESCAPED_UNICODE) . PHP_EOL;
                 }
-                die;
                 return $this->response()->success(['value' => $path], '文件上传成功！'); // 返回成功消息
             } else {
                 return $this->response()->fail('文件上传失败！');
@@ -435,29 +436,22 @@ class TeacherController extends AdminController
     }
 
 
-    public function readCsv($filePath): \Generator
+    public function readCsv($filePath)
     {
-        $errors = [];
-        $rows = SimpleExcelReader::create($filePath)
-            //->noHeaderRow() //不要键名
-            ->getRows()
-            ->filter(function(array $rowProperties) use(&$errors) {
-//                $msg = '';
-//                if (!$rowProperties['region_id']) {
-//                    $msg .= $rowProperties['region_id'] . '_地区为空';
-//                }
-//                if (!$rowProperties['avatar']) {
-//                    $msg .= $rowProperties['avatar'] . '_头像为空';
-//                };
-//                $errors[] = $msg ? $rowProperties['teacher_name'] . $msg : '';
-//
-//                return !in_array($rowProperties['teacher_name'], ['孙永刚','王文平','方勇勤']);
-            })
-            ->each(function(array $rowProperties) {
-                return $rowProperties;
-            });
-        yield $rows;
 
+        $wg = new WaitGroup();
+        $rows = SimpleExcelReader::create($filePath)->getRows()->toArray();
+        foreach ($rows as $index => $row) {
+                $wg->add(); // 增加等待计数
+                Coroutine::run(function () use ($wg, $index, $row, &$results) {
+                    try {
+                        // 并发执行任务
+                        dump($index . '_' . $row);
+                    } finally {
+                        $wg->done(); // 任务完成，减少等待计数
+                    }
+                });
+        }
 
     }
 
