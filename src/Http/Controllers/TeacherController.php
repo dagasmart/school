@@ -132,12 +132,11 @@ class TeacherController extends AdminController
             amis()->Tab()->title('基本信息')->body([
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->GroupControl()->direction('vertical')->body([
-                        amis()->TextControl('teacher_name', '姓名'),
+                        amis()->TextControl('teacher_name', '姓名')->required(),
                         amis()->TextControl('teacher_sn', '教师编码'),
-                        amis()->TextControl('id_card', '身份证号'),
-                        amis()->TextControl('work_sn', '工号'),
-                        amis()->RadiosControl('sex', '性别')
-                            ->options(Enum::sex()),
+                        amis()->TextControl('id_card', '身份证号')->required(),
+                        amis()->TextControl('work_sn', '教工号'),
+                        amis()->TextControl('mobile', '手机号')->required(),
                     ]),
                     amis()->GroupControl()->direction('vertical')->body([
                         amis()->ImageControl('avatar')
@@ -159,17 +158,14 @@ class TeacherController extends AdminController
                 ]),
                 amis()->Divider(),
                 amis()->GroupControl()->mode('horizontal')->body([
+                    amis()->SelectControl('sex', '性别')
+                        ->options(Enum::sex())->value(3),
                     amis()->SelectControl('nation_id', '民族')
                         ->options(Enum::nation()),
-                    amis()->SelectControl('work_status', '工作状态')
-                        ->options(Enum::WorkStatus),
-                ]),
-                amis()->Divider(),
-                amis()->GroupControl()->mode('horizontal')->body([
-                    amis()->SelectControl('full_teacher', '专职老师')
-                        ->options(Enum::IsFull),
-                    amis()->SelectControl('work_status', '工作状态')
-                        ->options(Enum::WorkStatus),
+                    amis()->SelectControl('work_status', '状态')
+                        ->options(Enum::WorkStatus)
+                        ->value(1)
+                        ->required(),
                 ]),
             ]),
             // 学校信息
@@ -216,7 +212,7 @@ class TeacherController extends AdminController
                     ]),
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->TextControl('address', '家庭住址'),
-                    amis()->TextControl('mobile', '联系电话'),
+                    amis()->TextControl('email', '常用邮箱'),
                 ]),
                 amis()->HiddenControl('region_info', '地区信息')->id('form_region_info'),
                 amis()->TextControl('address_info', '详细地址')
@@ -407,11 +403,7 @@ class TeacherController extends AdminController
         }
         clearstatcache();
         app('files')->deleteDirectory(storage_path('app/public/chunk/' . $uploadId));
-        foreach ($this->readCsv($fullPath) as $i => $item) {
-            echo  $i . '行' . json_encode($item, JSON_UNESCAPED_UNICODE) . PHP_EOL;
-            //ob_end_clean(); //清除缓存
-        }
-        die;
+        $this->readCsv($fullPath);
         return $this->response()->success(['value' => $path], '上传成功');
     }
 
