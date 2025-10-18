@@ -15,8 +15,6 @@ class Student extends Model
 
     public $timestamps = false;
 
-    public $hidden = ['f_idcard2', 'f_code2']; //排除乱码字段
-
     public function sexOption(): array
     {
         return [['value'=>1, 'label'=>'男'], ['value'=>2, 'label'=>'女']];
