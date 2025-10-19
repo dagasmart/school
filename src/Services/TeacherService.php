@@ -109,7 +109,7 @@ class TeacherService extends AdminService
     public function jobOption(): array
     {
         $list = Job::query()
-            ->select(admin_raw('*, label_name label, id as value'))
+            ->select(admin_raw('*, label_name as label, id as value'))
             ->orderBy('sort')
             ->get()
             ->toArray();
