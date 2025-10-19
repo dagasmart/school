@@ -34,7 +34,7 @@ class School extends Model
 
     public function class(): hasOne
     {
-        return $this->hasOne(SchoolClass::class, 'id', 'class_id')->select('id','name');
+        return $this->hasOne(SchoolClasses::class, 'id', 'class_id')->select('id','name');
     }
 
 }

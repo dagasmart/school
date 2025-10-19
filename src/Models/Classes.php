@@ -7,10 +7,10 @@ use Illuminate\Support\Collection;
 /**
  * 基础-学生表
  */
-class SchoolClassroom extends Model
+class Classes extends Model
 {
 
-	protected $table = 'biz_school_classroom';
+	protected $table = 'biz_classes';
     protected $primaryKey = 'id';
 
     public $timestamps = false;

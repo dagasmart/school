@@ -10,7 +10,7 @@ Route::group([
     $router->resource('school/index', Controllers\SchoolController::class);
     $router->resource('school/teacher', Controllers\TeacherController::class);
     $router->resource('school/student', Controllers\StudentController::class);
-    $router->resource('school/classroom', Controllers\ClassroomController::class);
+    $router->resource('school/classes', Controllers\ClassesController::class);
 });
 
 //一键导入文件

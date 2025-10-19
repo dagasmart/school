@@ -2,7 +2,7 @@
 
 namespace DagaSmart\School\Services;
 
-use DagaSmart\School\Models\Classroom;
+use DagaSmart\School\Models\Classes;
 use DagaSmart\BizAdmin\Services\AdminService;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -10,12 +10,12 @@ use Illuminate\Database\Eloquent\Builder;
 /**
  * 基础-学生表
  *
- * @method Classroom getModel()
- * @method Classroom|Builder query()
+ * @method Classes getModel()
+ * @method Classes|Builder query()
  */
-class ClassroomService extends AdminService
+class ClassesService extends AdminService
 {
-	protected string $modelName = Classroom::class;
+	protected string $modelName = Classes::class;
 
     public function listQuery()
     {

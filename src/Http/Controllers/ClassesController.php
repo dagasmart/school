@@ -3,7 +3,7 @@
 namespace DagaSmart\School\Http\Controllers;
 
 use DagaSmart\School\Enums\Enum;
-use DagaSmart\School\Services\ClassroomService;
+use DagaSmart\School\Services\ClassesService;
 use DagaSmart\BizAdmin\Controllers\AdminController;
 use DagaSmart\BizAdmin\Renderers\Form;
 use DagaSmart\BizAdmin\Renderers\Page;
@@ -11,11 +11,11 @@ use DagaSmart\BizAdmin\Renderers\Page;
 /**
  * 基础-班级表
  *
- * @property ClassroomService $service
+ * @property ClassesService $service
  */
-class ClassroomController extends AdminController
+class ClassesController extends AdminController
 {
-	protected string $serviceName = ClassroomService::class;
+	protected string $serviceName = ClassesService::class;
 
 	public function list(): Page
     {

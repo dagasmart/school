@@ -30,7 +30,7 @@ class SchoolStudent extends Model
 
     public function class(): hasOne
     {
-        return $this->hasOne(Classroom::class, 'id', 'class_id')->select('id','name');
+        return $this->hasOne(Classes::class, 'id', 'class_id')->select('id','name');
     }
 
 }
