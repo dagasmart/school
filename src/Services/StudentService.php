@@ -2,6 +2,8 @@
 
 namespace DagaSmart\School\Services;
 
+use DagaSmart\School\Models\Classes;
+use DagaSmart\School\Models\Grade;
 use DagaSmart\School\Models\School;
 use DagaSmart\School\Models\Student;
 use DagaSmart\BizAdmin\Services\AdminService;
@@ -26,13 +28,18 @@ class StudentService extends AdminService
         $gender = $request->gender ?? null;
 
         return $this->query()
-            ->with(['school','class'])
+            ->with([
+                'school',
+//                'classes' => function($query) {
+//                    $query->with(['school']);
+//                }
+            ])
             ->whereNull('deleted_at')
             ->when($gender, function ($query) use ($gender) {
                 $query->where('gender', $gender);
             })
             ->when($name, function ($query) use ($name) {
-                $query->where('name', 'like', "%{$name}%");
+                $query->where('student_name', 'like', "%{$name}%");
             })
             ->when($school_id, function($query) use ($school_id) {
                 $query->whereHas('school', function($query) use ($school_id) {
@@ -47,10 +54,35 @@ class StudentService extends AdminService
 
     }
 
-    public function getSchoolData(): array
+    /**
+     * 学校列表
+     * @return array
+     */
+    public function getSchoolAll(): array
     {
         $model = new School;
         return $model->query()->whereNull('deleted_at')->get(['id as value','school_name as label'])->toArray();
+    }
+
+    /**
+     * 年级列表
+     * @return array
+     */
+    public function getGradeAll(): array
+    {
+        $model = new Grade;
+        $data = $model->query()->get(['id as value','grade_name as label', 'grade_no as id', 'parent_id'])->toArray();
+        return array2tree($data);
+    }
+
+    /**
+     * 班级列表
+     * @return array
+     */
+    public function getClassesAll(): array
+    {
+        $model = new Classes;
+        return $model->query()->get(['id as value','class_name as label'])->toArray();
     }
 
 }

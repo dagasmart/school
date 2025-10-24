@@ -3,6 +3,7 @@
 namespace DagaSmart\School\Models;
 
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\hasOne;
 
 /**
@@ -22,12 +23,12 @@ class Student extends Model
 
     public function school(): hasOne
     {
-        return $this->hasOne(School::class, 'id', 'school_id')->select('id','school_name');
+        return $this->hasOne(SchoolGradeClassesStudent::class)->with(['classes','grade','school']);
     }
 
-    public function class(): hasOne
-    {
-        return $this->hasOne(Classes::class, 'id', 'class_id')->select('id','name');
-    }
+//    public function classes(): belongsToMany
+//    {
+//        return $this->belongsToMany(Classes::class, SchoolGradeClassesStudent::class, 'student_id', 'classes_id')->select(['id','class_name']);
+//    }
 
 }

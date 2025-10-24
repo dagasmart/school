@@ -34,7 +34,7 @@ class StudentController extends AdminController
                 amis()->SelectControl('school_id', '学校')
                     ->multiple()
                     ->searchable()
-                    ->options($this->service->getSchoolData())
+                    ->options($this->service->getSchoolAll())
                     ->clearable()
                     ->placeholder('请选择学校...')
                     ->size('lg'),
@@ -53,16 +53,17 @@ class StudentController extends AdminController
                 amis()->TableColumn('id', 'ID')->sortable()->fixed('left'),
                 amis()->TableColumn('name', '姓名')->searchable()->fixed('left'),
                 amis()->TableColumn('student_code', '国网学籍号')->searchable(),
-                amis()->TableColumn('school.school_name', '学校')
+                amis()->TableColumn('school.school.school_name', '学校')
                     ->searchable([
                         'name' => 'school_id',
                         'type' => 'select',
                         'multiple' => true,
                         'searchable' => true,
-                        'options' => $this->service->getSchoolData(),
+                        'options' => $this->service->getSchoolAll(),
                     ])
                     ->width(200),
-                amis()->TableColumn('class.name', '班级')->width('100px'),
+                amis()->TableColumn('school.grade.grade_name', '年级')->width(100),
+                amis()->TableColumn('school.classes.class_name', '班级')->width(100),
                 amis()->TableColumn('face_img', '学生照片')
                     ->set('src','${face_img}')
                     ->set('type','avatar')
@@ -128,16 +129,22 @@ class StudentController extends AdminController
                         amis()->TextControl('id_number', '身份证号')
                             ->required(),
                         amis()->HiddenControl('student_code', '国网学籍号')->value('G${id_number}'),
-                        amis()->SelectControl('school_id', '学校')
-                            ->options($this->service->getSchoolData())
+                        amis()->SelectControl('school.school.id', '学校')
+                            ->options($this->service->getSchoolAll())
                             ->searchable()
                             ->required(),
-                        amis()->SelectControl('grade_id', '年级')
-                            ->options(Enum::Grade)
+                        amis()->SelectControl('school.grade.id', '年级')
+                            ->options($this->service->getGradeAll())
                             ->selectMode('group')
                             ->searchable()
+                            ->disabledOn('${!school.school.id}')
                             ->required(),
-                        amis()->SelectControl('class_id', '班级')->required(),
+                        amis()->SelectControl('school.classes.id', '班级')
+                            ->options($this->service->getClassesAll())
+                            ->selectMode('group')
+                            ->searchable()
+                            ->disabledOn('${!school.grade.id}')
+                            ->required(),
                     ]),
                     amis()->GroupControl()->direction('vertical')->body([
                         amis()->ImageControl('picture')
@@ -221,48 +228,64 @@ class StudentController extends AdminController
 
 	public function detail()
 	{
-		return $this->baseDetail()->body([
-			amis()->TextControl('id', 'ID')->static(),
-			amis()->TextControl('student_code', '国网学籍号')->static(),
-			amis()->TextControl('class_id', '班级id')->static(),
-			amis()->TextControl('school_id', '学校id')->static(),
-			amis()->TextControl('name', '姓名')->static(),
-			amis()->TextControl('picture', '头像')->static(),
-			amis()->TextControl('gender', '性别1男 2女')->static(),
-			amis()->TextControl('nation_id', '民族id')->static(),
-			amis()->TextControl('status', '状态1 正常 2请假')->static(),
-			amis()->TextControl('id_number', '身份证号')->static(),
-			amis()->TextControl('mobile', '电话')->static(),
-			amis()->TextControl('parent_mobile', '家长电话')->static(),
-			amis()->TextControl('live_school', '是否住校1 是 2否')->static(),
-			amis()->TextControl('remark', '备注')->static(),
-			amis()->TextControl('hk', '户口类型')->static(),
-			amis()->TextControl('face_img', '人脸识别照片')->static(),
-			amis()->TextControl('graduate_status', '是否毕业 1是 2否')->static(),
-			amis()->TextControl('food_card_expire', '饭卡过期 1是 2否')->static(),
-			amis()->TextControl('have_face_pay', '已开通刷脸支付 1是2否')->static(),
-			amis()->TextControl('have_pay_photo', '已采集支付照片 1是 2否')->static(),
-			amis()->TextControl('is_free', '是否免缴服务费 1是 2否')->static(),
-			amis()->TextControl('is_pay', '缴费状态 1已缴费 2未缴费')->static(),
-			amis()->TextControl('pay_status', '支付状态：1=正常，2=异常(有待支付订单) , 3禁用拉黑')->static(),
-			amis()->TextControl('pay_status_clock', '黑名单状态锁，防止定时任务刷新状态，0未锁定，1锁定')->static(),
-			amis()->TextControl('pay_status_clock_time', '锁定时间')->static(),
-			amis()->TextControl('enjoy_sponsor', '是否享受资助 1是 2否')->static(),
-			amis()->TextControl('sponsor_money', '资助金额')->static(),
-			amis()->TextControl('send_sponsor_type', '发放方式')->static(),
-			amis()->TextControl('send_sponsor_time', '发放时间')->static(),
-			amis()->TextControl('school_face_pass_status', '校园一脸通行开通状态 OPEN 开通 CLOSE关闭')->static(),
-			amis()->TextControl('school_face_payment_status', '校园一脸通行刷脸支付开通状态 OPEN开通 CLOSE关闭')->static(),
-			amis()->TextControl('school_face_data', '校园一脸通行开通返回的数据')->static(),
-			amis()->TextControl('end_time', '服务费截止时间')->static(),
-			amis()->TextControl('ali_user_id', '刷脸用户id')->static(),
-			amis()->TextControl('alifacepaystatus', '开通刷脸支付 0未开通，1已开通')->static(),
-			amis()->TextControl('alifacepayopertime', '开通刷脸支付时间')->static(),
-			amis()->TextControl('day_maxpay', '日消费限额')->static(),
-			amis()->TextControl('non_payment_num', '未支付订单数量')->static(),
-			amis()->TextControl('created_at', admin_trans('admin.created_at'))->static(),
-			amis()->TextControl('updated_at', admin_trans('admin.updated_at'))->static(),
-		]);
+		return $this->baseDetail()->mode('horizontal')->tabs([
+
+            // 基本信息
+            amis()->Tab()->title('基本信息')->body([
+
+                amis()->GroupControl()->mode('horizontal')->body([
+                    amis()->GroupControl()->direction('vertical')->body([
+                        amis()->TextControl('name', '姓名'),
+                        amis()->TextControl('id_number', '身份证号'),
+                        amis()->HiddenControl('student_code', '国网学籍号')->value('G${id_number}'),
+                        amis()->SelectControl('school.school.id', '学校')
+                            ->options($this->service->getSchoolAll())
+                            ->searchable(),
+                        amis()->SelectControl('school.grade.id', '年级')
+                            ->options($this->service->getGradeAll())
+                            ->selectMode('group')
+                            ->searchable()
+                            ->disabledOn('${!school.school.id}'),
+                        amis()->SelectControl('school.classes.id', '班级')
+                            ->options($this->service->getClassesAll())
+                            ->selectMode('group')
+                            ->searchable()
+                            ->disabledOn('${!school.grade.id}'),
+                    ]),
+                    amis()->GroupControl()->direction('vertical')->body([
+                        amis()->ImageControl('picture')
+                            ->thumbRatio('1:1')
+                            ->thumbMode('cover h-full rounded-md overflow-hidden')
+                            ->className(['overflow-hidden'=>true, 'h-full'=>true])
+                            ->imageClassName([
+                                'w-52'=>true,
+                                'h-64'=>true,
+                                'overflow-hidden'=>true
+                            ])
+                            ->fixedSize()
+                            ->fixedSizeClassName([
+                                'w-52'=>true,
+                                'h-64'=>true,
+                                'overflow-hidden'=>true
+                            ])
+                            ->crop([
+                                'aspectRatio' => '0.81',
+                            ]),
+                    ]),
+                ]),
+                amis()->Divider(),
+                amis()->GroupControl()->mode('horizontal')->body([
+                    amis()->SelectControl('gender', '性别')
+                        ->options(Enum::sex()),
+                    amis()->SelectControl('nation_id', '民族')
+                        ->options(Enum::nation())
+                        ->value(1),
+                    amis()->SelectControl('status', '状态')
+                        ->options(Enum::StudentState)
+                        ->value(1),
+                ]),
+            ]),
+		])->disabled();
 	}
 
     public function importAction($api=null): DialogAction
