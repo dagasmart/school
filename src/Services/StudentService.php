@@ -19,39 +19,14 @@ class StudentService extends AdminService
 {
 	protected string $modelName = Student::class;
 
-    public function listQuery()
+
+    public function sortable($query): void
     {
-        $request = request();
-        $name = mb_convert_encoding($request->name, 'UTF-8', 'auto') ?? null;
-        $school_name = $request->school_name ?? null;
-        $school_id = $request->school_id ?? null;
-        $gender = $request->gender ?? null;
-
-        return $this->query()
-            ->with([
-                'school',
-//                'classes' => function($query) {
-//                    $query->with(['school']);
-//                }
-            ])
-            ->whereNull('deleted_at')
-            ->when($gender, function ($query) use ($gender) {
-                $query->where('gender', $gender);
-            })
-            ->when($name, function ($query) use ($name) {
-                $query->where('student_name', 'like', "%{$name}%");
-            })
-            ->when($school_id, function($query) use ($school_id) {
-                $query->whereHas('school', function($query) use ($school_id) {
-                    $query->whereIn('id', explode(',', $school_id));
-                });
-            })
-            ->when($school_name, function($query) use ($school_name) {
-                $query->whereHas('school', function($query) use ($school_name) {
-                    $query->where('school_name', 'like', "%{$school_name}%");
-                });
-            });
-
+        if (request()->orderBy && request()->orderDir) {
+            $query->orderBy(request()->orderBy, request()->orderDir ?? 'asc');
+        } else {
+            $query->orderBy($this->primaryKey(), 'asc');
+        }
     }
 
     /**

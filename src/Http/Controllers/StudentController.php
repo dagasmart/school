@@ -29,6 +29,7 @@ class StudentController extends AdminController
 				...$this->baseHeaderToolBar(),
                 $this->importAction(admin_url('student/import')),
                 $this->exportAction(),
+                $this->dictForm(),
 			])
             ->filter($this->baseFilter()->body([
                 amis()->SelectControl('school_id', '学校')
@@ -51,7 +52,7 @@ class StudentController extends AdminController
             ->autoFillHeight(true)
             ->columns([
                 amis()->TableColumn('id', 'ID')->sortable()->fixed('left'),
-                amis()->TableColumn('name', '姓名')->searchable()->fixed('left'),
+                amis()->TableColumn('student_name', '姓名')->searchable()->fixed('left'),
                 amis()->TableColumn('student_code', '国网学籍号')->searchable(),
                 amis()->TableColumn('school.school.school_name', '学校')
                     ->searchable([
@@ -103,9 +104,8 @@ class StudentController extends AdminController
                     ->set('options', $this->service->getModel()->sexOption())
                     ->set('static', true),
                 amis()->TableColumn('status', '状态'),
-                amis()->TableColumn('id_number', '身份证号')->searchable(),
+                amis()->TableColumn('id_card', '身份证号')->searchable(),
 				amis()->TableColumn('mobile', '电话')->searchable(),
-				amis()->TableColumn('non_payment_num', '未支付订单数量')->sortable(),
 				amis()->TableColumn('updated_at', admin_trans('admin.updated_at'))->type('datetime')->sortable(),
 				$this->rowActions('dialog')
                     ->set('align','center')
@@ -125,8 +125,8 @@ class StudentController extends AdminController
 
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->GroupControl()->direction('vertical')->body([
-                        amis()->TextControl('name', '姓名')->required(),
-                        amis()->TextControl('id_number', '身份证号')
+                        amis()->TextControl('student_name', '姓名')->required(),
+                        amis()->TextControl('id_card', '身份证号')
                             ->required(),
                         amis()->HiddenControl('student_code', '国网学籍号')->value('G${id_number}'),
                         amis()->SelectControl('school.school.id', '学校')
@@ -235,8 +235,8 @@ class StudentController extends AdminController
 
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->GroupControl()->direction('vertical')->body([
-                        amis()->TextControl('name', '姓名'),
-                        amis()->TextControl('id_number', '身份证号'),
+                        amis()->TextControl('student_name', '姓名'),
+                        amis()->TextControl('id_card', '身份证号'),
                         amis()->HiddenControl('student_code', '国网学籍号')->value('G${id_number}'),
                         amis()->SelectControl('school.school.id', '学校')
                             ->options($this->service->getSchoolAll())
@@ -342,4 +342,79 @@ class StudentController extends AdminController
             return $this->response()->fail('文件上传失败！');
         }
     }
+
+    public function dictForm(): DialogAction
+    {
+        $form = $this->baseForm()->api($this->getStorePath())->data([
+            'enabled' => true,
+            'sort'    => 0,
+        ])->body([
+            amis()->TextControl()->name('value')->label()->clearable()->required()->maxLength(255),
+            amis()->TextControl()->name('key')->label()->clearable()->required()->maxLength(255),
+            amis()->SwitchControl()->name('enabled')->label(),
+        ]);
+
+        $createButton = amis()->DialogAction()
+            ->dialog(amis()->Dialog()->title(__('admin.create'))->body($form))
+            ->label(__('admin.create'))
+            ->icon('fa fa-add')
+            ->level('primary');
+
+        $editForm = (clone $form)->api($this->getUpdatePath('$id'))->initApi($this->getEditGetDataPath('$id'));
+
+        $editButton = amis()->DialogAction()
+            ->dialog(amis()->Dialog()->title(__('admin.edit'))->body($editForm))
+            ->label(__('admin.edit'))
+            ->icon('fa-regular fa-pen-to-square')
+            ->level('link');
+
+        return amis()->DialogAction()->label('班级管理')->dialog(
+            amis()->Dialog()->title('班级管理')->size('lg')->actions([])->body(
+                amis()->CRUDTable()
+                    ->perPage(10)
+                    ->affixHeader(false)
+                    ->filterTogglable()
+                    ->filterDefaultVisible(false)
+                    ->bulkActions([$this->bulkDeleteButton()])
+                    ->perPageAvailable([10, 20, 30, 50, 100, 200])
+                    ->footerToolbar(['switch-per-page', 'statistics', 'pagination'])
+                    ->api($this->getListGetDataPath() . '&_type=1')
+                    ->headerToolbar([
+                        $createButton,
+                        'bulkActions',
+                        amis('reload')->set('align','right'),
+                        amis('filter-toggler')->set('align','right'),
+                    ])
+                    ->filter(
+                        $this->baseFilter()->data(['_type' => 1])->body([
+                            amis()->TextControl()->name('type_key')->label()->clearable()->size('md'),
+                            amis()->TextControl()->name('type_value')->label()->clearable()->size('md'),
+                            amis()->SelectControl()
+                                ->name('type_enabled')
+                                ->label()
+                                ->size('md')
+                                ->clearable()
+                                ->options([
+                                    '1' => '是',
+                                    '0' => '否',
+                                ]),
+                        ])
+                    )
+                    ->columns([
+                        amis()->TableColumn()->name('value')->label(),
+                        amis()->TableColumn()->name('key')->label(),
+                        amis()->TableColumn()
+                            ->name('enabled')
+                            ->label()
+                            ->type('status'),
+                        amis()->Operation()->label(__('admin.actions'))->buttons([
+                            $editButton,
+                            $this->rowDeleteButton(),
+                        ])->set('width', 150),
+                    ])
+            )
+        );
+    }
+
+
 }

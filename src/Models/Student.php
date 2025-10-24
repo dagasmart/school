@@ -14,7 +14,19 @@ class Student extends Model
 	protected $table = 'biz_student';
     protected $primaryKey = 'id';
 
-    public $timestamps = false;
+    public $timestamps = true;
+
+    protected $appends = ['student_code'];
+
+    public function getIdCardAttribute($value): string
+    {
+        return admin_sensitive($value, 6, 8);
+    }
+
+    public function getStudentCodeAttribute(): string
+    {
+        return 'G' . $this->id_card;
+    }
 
     public function sexOption(): array
     {
