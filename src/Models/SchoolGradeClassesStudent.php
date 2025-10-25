@@ -13,6 +13,9 @@ class SchoolGradeClassesStudent extends Model
 {
 	protected $table = 'biz_school_grade_classes_student';
 
+    // 允许批量赋值的字段
+    protected $fillable = ['school_id','grade_id','classes_id','student_id'];
+
     public $timestamps = false;
 
     /**

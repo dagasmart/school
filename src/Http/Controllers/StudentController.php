@@ -65,8 +65,8 @@ class StudentController extends AdminController
                     ->width(200),
                 amis()->TableColumn('school.grade.grade_name', '年级')->width(100),
                 amis()->TableColumn('school.classes.class_name', '班级')->width(100),
-                amis()->TableColumn('face_img', '学生照片')
-                    ->set('src','${face_img}')
+                amis()->TableColumn('avatar', '学生照片')
+                    ->set('src','${avatar}')
                     ->set('type','avatar')
                     ->set('fit','cover')
                     ->set('size',60)
@@ -84,7 +84,7 @@ class StudentController extends AdminController
                                         'showCloseButton' => false, //显示关闭
                                         'body' => [
                                             amis()->Image()
-                                                ->src('${face_img}')
+                                                ->src('${avatar}')
                                                 ->defaultImage('/admin-assets/no-error.svg')
                                                 ->width('100%')
                                                 ->height('100%'),
@@ -122,32 +122,36 @@ class StudentController extends AdminController
 
             // 基本信息
             amis()->Tab()->title('基本信息')->body([
-
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->GroupControl()->direction('vertical')->body([
                         amis()->TextControl('student_name', '姓名')->required(),
                         amis()->TextControl('id_card', '身份证号')
                             ->required(),
                         amis()->HiddenControl('student_code', '国网学籍号')->value('G${id_number}'),
-                        amis()->SelectControl('school.school.id', '学校')
+                        amis()->SelectControl('school_id', '学校')
                             ->options($this->service->getSchoolAll())
+                            ->value('${school.school.id}')
                             ->searchable()
                             ->required(),
-                        amis()->SelectControl('school.grade.id', '年级')
-                            ->options($this->service->getGradeAll())
+                        amis()->SelectControl('grade_id', '年级')
+                            //->options($this->service->getGradeAll())
+                            ->source(admin_url('biz/school/${school_id||0}/grade'))
                             ->selectMode('group')
                             ->searchable()
-                            ->disabledOn('${!school.school.id}')
+                            ->value('${school.grade.id}')
+                            ->disabledOn('${!school_id}')
                             ->required(),
-                        amis()->SelectControl('school.classes.id', '班级')
-                            ->options($this->service->getClassesAll())
+                        amis()->SelectControl('classes_id', '班级')
+                            //->options($this->service->getClassesAll())
+                            ->source(admin_url('biz/school/${school_id||0}/grade/${grade_id||0}/classes'))
                             ->selectMode('group')
                             ->searchable()
-                            ->disabledOn('${!school.grade.id}')
+                            ->value('${school.classes.id}')
+                            ->disabledOn('${!grade_id}')
                             ->required(),
                     ]),
                     amis()->GroupControl()->direction('vertical')->body([
-                        amis()->ImageControl('picture')
+                        amis()->ImageControl('avatar')
                             ->thumbRatio('1:1')
                             ->thumbMode('cover h-full rounded-md overflow-hidden')
                             ->className(['overflow-hidden'=>true, 'h-full'=>true])
@@ -171,6 +175,7 @@ class StudentController extends AdminController
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->SelectControl('gender', '性别')
                         ->options(Enum::sex())
+                        ->value(3)
                         ->required(),
                     amis()->SelectControl('nation_id', '民族')
                         ->options(Enum::nation())
@@ -232,28 +237,33 @@ class StudentController extends AdminController
 
             // 基本信息
             amis()->Tab()->title('基本信息')->body([
-
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->GroupControl()->direction('vertical')->body([
-                        amis()->TextControl('student_name', '姓名'),
-                        amis()->TextControl('id_card', '身份证号'),
+                        amis()->TextControl('student_name', '姓名')->required(),
+                        amis()->TextControl('id_card', '身份证号')
+                            ->required(),
                         amis()->HiddenControl('student_code', '国网学籍号')->value('G${id_number}'),
                         amis()->SelectControl('school.school.id', '学校')
                             ->options($this->service->getSchoolAll())
-                            ->searchable(),
+                            ->searchable()
+                            ->required(),
                         amis()->SelectControl('school.grade.id', '年级')
-                            ->options($this->service->getGradeAll())
+                            //->options($this->service->getGradeAll())
+                            ->source(admin_url('biz/school/${school.school.id||0}/grade'))
                             ->selectMode('group')
                             ->searchable()
-                            ->disabledOn('${!school.school.id}'),
+                            ->disabledOn('${!school.school.id}')
+                            ->required(),
                         amis()->SelectControl('school.classes.id', '班级')
-                            ->options($this->service->getClassesAll())
+                            //->options($this->service->getClassesAll())
+                            ->source(admin_url('biz/school/${school.school.id||0}/grade/${school.grade.id||0}/classes'))
                             ->selectMode('group')
                             ->searchable()
-                            ->disabledOn('${!school.grade.id}'),
+                            ->disabledOn('${!school.grade.id}')
+                            ->required(),
                     ]),
                     amis()->GroupControl()->direction('vertical')->body([
-                        amis()->ImageControl('picture')
+                        amis()->ImageControl('avatar')
                             ->thumbRatio('1:1')
                             ->thumbMode('cover h-full rounded-md overflow-hidden')
                             ->className(['overflow-hidden'=>true, 'h-full'=>true])
@@ -276,16 +286,21 @@ class StudentController extends AdminController
                 amis()->Divider(),
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->SelectControl('gender', '性别')
-                        ->options(Enum::sex()),
+                        ->options(Enum::sex())
+                        ->value(3)
+                        ->required(),
                     amis()->SelectControl('nation_id', '民族')
                         ->options(Enum::nation())
-                        ->value(1),
+                        ->value(1)
+                        ->required(),
                     amis()->SelectControl('status', '状态')
                         ->options(Enum::StudentState)
-                        ->value(1),
+                        ->value(1)
+                        ->required(),
                 ]),
             ]),
-		])->disabled();
+            //其他
+		])->static();
 	}
 
     public function importAction($api=null): DialogAction

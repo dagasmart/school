@@ -140,4 +140,19 @@ class ClassesController extends AdminController
 //			amis()->TextControl('updated_at', admin_trans('admin.updated_at'))->static(),
 		]);
 	}
+
+
+    /**
+     * 学校年级班级列表
+     * @param $school_id
+     * @param $grade_id
+     * @return array
+     */
+    public function SchoolGradeClasses($school_id, $grade_id): array
+    {
+        return $this->service->SchoolGradeClasses($school_id, $grade_id);
+
+    }
+
+
 }

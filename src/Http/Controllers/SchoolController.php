@@ -178,7 +178,7 @@ class SchoolController extends AdminController
                     amis()->CheckboxesControl('school_grade',null)
                         ->checkAll()
                         ->columnsCount(1)
-                        ->options(Enum::Grade)
+                        ->options($this->service->getGradeAll())
                 ])
             ]),
         ]);
