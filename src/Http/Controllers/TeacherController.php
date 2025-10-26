@@ -322,16 +322,46 @@ class TeacherController extends AdminController
             amis()->Tab()->title('家庭情况')->body([
                 amis()->InputCityControl('region_id', '所在地区')
                     ->searchable()
-                    ->extractValue()
-                    ->required(),
+                    ->extractValue(false)
+                    ->required()
+                    ->onEvent([
+                        'change' => [
+                            'actions' => [
+                                [
+                                    'actionType'  => 'setValue',
+                                    'componentId' => 'form_region_info',
+                                    'args'        => [
+                                        'value' => '${value}'
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ]),
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->TextControl('address', '家庭住址'),
-                    amis()->TextControl('mobile', '联系电话'),
+                    amis()->TextControl('email', '常用邮箱'),
                 ]),
+                amis()->HiddenControl('region_info', '地区信息')->id('form_region_info'),
                 amis()->TextControl('address_info', '详细地址')
-                    ->value('${region.province} ${region.city} ${region.district} ${address}')->static(),
-
-                amis()->TextControl('mobile', '家庭成员'),
+                    ->value('${region_info.province} ${region_info.city} ${region_info.district} ${address}')
+                    ->static(),
+                amis()->Divider()->title('家庭成员')->titlePosition('left'),
+                amis()->ComboControl('family', false)->items([
+                    amis()->TextControl('family_name', '${index+1}.姓名')
+                        ->clearable()
+                        ->required(),
+                    amis()->SelectControl('family_ties', '关系')
+                        ->options(Enum::family())
+                        ->clearable()
+                        ->required(),
+                    amis()->TextControl('family_mobile','电话')->clearable(),
+                ])
+                    ->className('border-gray-100 border-dashed')
+                    ->mode('horizontal')
+                    ->multiLine(false)
+                    ->multiple()
+                    ->strictMode(false)
+                    ->removable(),
             ]),
         ])->static();
 	}
