@@ -9,7 +9,7 @@ namespace DagaSmart\School\Models;
 class Stage extends Model
 {
 
-	protected $table = 'fa_stage';
+	protected $table = 'biz_stage';
     protected $primaryKey = 'id';
 
     public $timestamps = false;

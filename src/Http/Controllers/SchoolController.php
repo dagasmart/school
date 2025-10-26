@@ -39,7 +39,7 @@ class SchoolController extends AdminController
                     ->options(Enum::Nature)
                     ->clearable(),
                 amis()->SelectControl('school_mode', '办学模式')
-                    ->options(Enum::Mode)
+                    ->options($this->service->getStageAll())
                     ->clearable(),
                 amis()->Divider(),
                 amis()->DateRangeControl('register_time', '注册登记')
@@ -55,16 +55,20 @@ class SchoolController extends AdminController
                     ->set('fixed','left'),
                 amis()->TableColumn('school_code', '学校代码'),
                 amis()->TableColumn('school_mode', '办学模式')
-                    //->searchable(['name' => 'school_mode', 'type' => 'select', 'options' => Enum::Mode])
-                    ->filterable(['options' => Enum::Mode])
                     ->set('type', 'select')
-                    ->set('options', Enum::Mode)
+                    ->set('options', $this->service->getStageAll())
+                    ->filterable(['options' => $this->service->getStageAll()])
+                    ->searchable([
+                        'name' => 'school_mode',
+                        'type' => 'select',
+                        'options' => $this->service->getStageAll()
+                    ])
                     ->set('static', true),
                 amis()->TableColumn('school_nature', '学校性质')
-                    //->searchable(['name' => 'school_nature', 'type' => 'select', 'options' => Enum::Nature])
-                    ->filterable(['options' => Enum::Nature])
                     ->set('type', 'select')
                     ->set('options', Enum::Nature)
+                    ->filterable(['options' => Enum::Nature])
+                    ->searchable(['name' => 'school_nature', 'type' => 'select', 'options' => Enum::Nature])
                     ->set('static', true),
                 amis()->TableColumn('region', '所属地区')
                     ->searchable(['name'=>'region','type'=>'input-city'])
@@ -80,7 +84,7 @@ class SchoolController extends AdminController
                     ->width(120)
                     ->sortable()
                     ->quickEdit(['type'=>'input-date','value'=>'${register_time}']),
-                amis()->TableColumn('credit_code', '信用代码'),
+                amis()->TableColumn('credit_code', '信用代码')->copyable(),
                 amis()->TableColumn('legal_person', '学校法人'),
                 amis()->TableColumn('contacts_mobile', '联系电话')->searchable(),
                 amis()->TableColumn('contacts_email', '联系邮件')->searchable(),
@@ -114,7 +118,7 @@ class SchoolController extends AdminController
                         amis()->SelectControl('school_nature', '学校性质')
                             ->options(Enum::Nature),
                         amis()->SelectControl('school_mode', '办学模式')
-                            ->options(Enum::Mode),
+                            ->options($this->service->getStageAll()),
                         amis()->DateControl('register_time', '注册日期'),
                     ]),
                     amis()->GroupControl()->direction('vertical')->body([
@@ -179,6 +183,7 @@ class SchoolController extends AdminController
                         ->checkAll()
                         ->columnsCount(1)
                         ->options($this->service->getGradeAll())
+                        ->required()
                 ])
             ]),
         ]);
@@ -196,15 +201,14 @@ class SchoolController extends AdminController
                         amis()->SelectControl('school_nature', '学校性质')
                             ->options(Enum::Nature),
                         amis()->SelectControl('school_mode', '办学模式')
-                            ->options(Enum::Mode),
-                        amis()->TextControl('register_time', '注册日期'),
+                            ->options($this->service->getStageAll()),
+                        amis()->DateControl('register_time', '注册日期'),
                     ]),
-
                     amis()->GroupControl()->direction('vertical')->body([
                         amis()->Image()
                             ->thumbClassName(['overflow-hidden'=>true, 'w-80'=>true, 'h-60'=>true])
                             ->src('${school_logo}')
-                            ->thumbMode('cover')
+                            ->thumbMode('contain')
                             ->enlargeAble(),
                     ]),
                 ]),
@@ -222,11 +226,36 @@ class SchoolController extends AdminController
                 amis()->InputCityControl('region', '所在地区')
                     ->searchable()
                     ->extractValue(false)
-                    ->required(),
+                    ->required()
+                    ->onEvent([
+                        'change' => [
+                            'actions' => [
+                                [
+                                    'actionType'  => 'setValue',
+                                    'componentId' => 'form_region_info',
+                                    'args'        => [
+                                        'value' => '${value}'
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ]),
+                amis()->HiddenControl('region_info', '地区信息')->id('form_region_info'),
                 amis()->TextControl('school_address', '学校地址'),
                 amis()->TextControl('school_address_info', '详细地址')
-                    ->value('${region.province} ${region.city} ${region.district} ${school_address}')
+                    ->value('${region_info.province} ${region_info.city} ${region_info.district} ${school_address}')
                     ->static(),
+            ]),
+            // 学段管理
+            amis()->Tab()->title('学段年级')->body([
+                amis()->GroupControl()->mode('horizontal')->body([
+                    amis()->CheckboxesControl('school_grade',null)
+                        ->checkAll()
+                        ->columnsCount(1)
+                        ->options($this->service->getGradeAll())
+                ])
+                ->disabled()
+                ->static(false)
             ]),
         ])->static();
 	}

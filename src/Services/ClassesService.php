@@ -46,7 +46,10 @@ class ClassesService extends AdminService
         $classes_id = SchoolGradeClasses::query()
             ->where('school_id', $school_id)
             ->where('grade_id', $grade_id)
-            ->pluck('classes_id');
+            ->pluck('classes_id')
+            ->unique()
+            ->filter()
+            ->toArray();
         return Classes::query()
             ->whereIn('id', $classes_id)
             ->get(['id as value','class_name as label'])

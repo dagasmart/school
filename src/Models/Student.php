@@ -31,8 +31,13 @@ class Student extends Model
 
     public function getAvatarAttribute($value): string
     {
-        return Storage::url($value);
+        return env('APP_URL') . $value;
+    }
 
+    public function setAvatarAttribute($value): string
+    {
+        $avatar = str_replace(env('APP_URL') . Storage::url(''), '', $value);
+        return Storage::url($avatar);
     }
 
     public function sexOption(): array

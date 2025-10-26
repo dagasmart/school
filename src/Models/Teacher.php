@@ -36,12 +36,19 @@ class Teacher extends Model
     /**
      * 头像
      * @param $value
-     * @return string
+     * @return string|null
      */
-    public function getAvatarAttribute($value): string
+    public function getAvatarAttribute($value): ?string
     {
-        return Storage::url($value);
+        return $value ? env('APP_URL') . $value : null;
     }
+
+    public function setAvatarAttribute($value): void
+    {
+        $avatar = str_replace(env('APP_URL') . Storage::url(''), '', $value);
+        $this->attributes['avatar'] = Storage::url($avatar);
+    }
+
 
     /**
      * 手机号脱敏

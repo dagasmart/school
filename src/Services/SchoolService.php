@@ -5,6 +5,7 @@ namespace DagaSmart\School\Services;
 use DagaSmart\School\Models\Grade;
 use DagaSmart\School\Models\School;
 use DagaSmart\BizAdmin\Services\AdminService;
+use DagaSmart\School\Models\Stage;
 use Illuminate\Database\Query\Builder;
 
 /**
@@ -42,13 +43,28 @@ class SchoolService extends AdminService
                 ->whereIn('id', $school_grade)
                 ->distinct()
                 ->pluck('parent_id')
+                ->filter()
+                ->unique()
                 ->toArray();
-            $data['school_grade'] = admin_sort(array_merge($parent, $school_grade), 'desc');
+            $data['school_grade'] = admin_sort(array_unique(array_merge($parent, $school_grade)), 'desc');
         }
         //地区代码
         $data['region'] = is_array($data['region']) ? $data['region']['code'] : $data['region'];
         //注册时间
         $data['register_time'] = strtotime($data['register_time']);
+    }
+
+    /**
+     * 学段列表
+     * @return array
+     */
+    public function getStageAll(): array
+    {
+        $model = new Stage;
+        return $model->query()
+            ->orderBy('sort')
+            ->get(['id as value', 'stage_name as label'])
+            ->toArray();
     }
 
     /**
@@ -58,7 +74,7 @@ class SchoolService extends AdminService
     public function getGradeAll(): array
     {
         $model = new Grade;
-        $data = $model->query()->get(['id as value','grade_name as label', 'grade_no as id', 'parent_id'])->toArray();
+        $data = $model->query()->get(['id as value','grade_name as label', 'id', 'parent_id'])->toArray();
         return array2tree($data);
     }
 
