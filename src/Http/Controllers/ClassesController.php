@@ -25,7 +25,6 @@ class ClassesController extends AdminController
 				$this->createButton('dialog'),
 				...$this->baseHeaderToolBar()
 			])
-            //->autoFillHeight(true)
             ->autoGenerateFilter()
             ->affixHeader()
             ->columnsTogglable()
@@ -103,12 +102,12 @@ class ClassesController extends AdminController
                 ->searchable()
                 ->required(),
 			amis()->TreeSelectControl('grade_id', '选择年级')
-                ->options(Enum::Grade)
+                ->options()
                 ->searchable()
                 ->onlyLeaf()
                 ->required(),
-            amis()->TextControl('class_code', '班级编码'),
-            amis()->TextControl('class_name', '班级名称'),
+            amis()->TextControl('classes_code', '班级编码'),
+            amis()->TextControl('classes_name', '班级名称'),
 			amis()->TextControl('leader_teacher', '班主任'),
 			amis()->TextControl('contacts_email', '联系邮件'),
 			amis()->TextControl('type', '学校类型'),
@@ -140,6 +139,15 @@ class ClassesController extends AdminController
 //			amis()->TextControl('updated_at', admin_trans('admin.updated_at'))->static(),
 		]);
 	}
+
+    /**
+     * 学校年级班级列表
+     */
+    public function data()
+    {
+        admin_abort(1223);
+    }
+
 
 
     /**

@@ -16,4 +16,10 @@ class Classes extends Model
 
     public $timestamps = false;
 
+
+    public function school(): hasOne
+    {
+        return $this->hasOne(SchoolGradeClasses::class)->with(['grade','school']);
+    }
+
 }

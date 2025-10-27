@@ -26,13 +26,16 @@ class School extends Model
 
     public function getSchoolLogoAttribute($value): ?string
     {
-        return $value ? env('APP_URL') . $value : null;
+        return empty($value) ? null : env('APP_URL') . $value;
     }
 
     public function setSchoolLogoAttribute($value): void
     {
-        $logo = str_replace(env('APP_URL') . Storage::url(''), '', $value);
-        $this->attributes['school_logo'] = Storage::url($logo);
+        $this->attributes['school_logo'] = null;
+        if ($value) {
+            $logo = str_replace(env('APP_URL') . Storage::url(''), '', $value);
+            $this->attributes['school_logo'] = Storage::url($logo);
+        }
     }
 
     public function sexOption(): array

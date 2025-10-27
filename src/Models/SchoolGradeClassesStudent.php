@@ -24,7 +24,7 @@ class SchoolGradeClassesStudent extends Model
      */
     public function classes(): hasOne
     {
-        return $this->hasOne(Classes::class, 'id', 'classes_id')->select(['id', 'class_name']);
+        return $this->hasOne(Classes::class, 'id', 'classes_id')->select(['id', 'classes_name']);
     }
 
     /**

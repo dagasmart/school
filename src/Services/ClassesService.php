@@ -20,19 +20,23 @@ class ClassesService extends AdminService
 {
 	protected string $modelName = Classes::class;
 
-    public function listQuery()
+
+    public function sortable($query): void
     {
-        return $this->query()->with(['bind' => function ($query) {
-            $query->select('school_id','staff_id')->orderBy('school_id','asc');
-        }]);
+        if (request()->orderBy && request()->orderDir) {
+            $query->orderBy(request()->orderBy, request()->orderDir ?? 'asc');
+        } else {
+            $query->orderBy($this->primaryKey(), 'asc');
+        }
     }
+
 
     /**
      * 学校列表
      */
     public function schoolData()
     {
-        return $this->getModel()->schoolData();
+        return (new StudentService)->getSchoolAll();
     }
 
     /**
@@ -52,7 +56,7 @@ class ClassesService extends AdminService
             ->toArray();
         return Classes::query()
             ->whereIn('id', $classes_id)
-            ->get(['id as value','class_name as label'])
+            ->get(['id as value','classes_name as label'])
             ->toArray();
     }
 

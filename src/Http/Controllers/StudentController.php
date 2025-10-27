@@ -29,7 +29,7 @@ class StudentController extends AdminController
 				...$this->baseHeaderToolBar(),
                 $this->importAction(admin_url('student/import')),
                 $this->exportAction(),
-                $this->dictForm(),
+                $this->classesAction(),
 			])
             ->filter($this->baseFilter()->body([
                 amis()->SelectControl('school_id', '学校')
@@ -64,7 +64,7 @@ class StudentController extends AdminController
                     ])
                     ->width(200),
                 amis()->TableColumn('school.grade.grade_name', '年级')->width(100),
-                amis()->TableColumn('school.classes.class_name', '班级')->width(100),
+                amis()->TableColumn('school.classes.classes_name', '班级')->width(100),
                 amis()->TableColumn('avatar', '学生照片')
                     ->set('src','${avatar}')
                     ->set('type','avatar')
@@ -132,21 +132,24 @@ class StudentController extends AdminController
                             ->options($this->service->getSchoolAll())
                             ->value('${school.school.id}')
                             ->searchable()
+                            ->clearable()
                             ->required(),
                         amis()->SelectControl('grade_id', '年级')
                             //->options($this->service->getGradeAll())
                             ->source(admin_url('biz/school/${school_id||0}/grade'))
                             ->selectMode('group')
-                            ->searchable()
                             ->value('${school.grade.id}')
+                            ->searchable()
+                            ->clearable()
                             ->disabledOn('${!school_id}')
                             ->required(),
                         amis()->SelectControl('classes_id', '班级')
                             //->options($this->service->getClassesAll())
                             ->source(admin_url('biz/school/${school_id||0}/grade/${grade_id||0}/classes'))
                             ->selectMode('group')
-                            ->searchable()
                             ->value('${school.classes.id}')
+                            ->searchable()
+                            ->clearable()
                             ->disabledOn('${!grade_id}')
                             ->required(),
                     ]),
@@ -358,15 +361,36 @@ class StudentController extends AdminController
         }
     }
 
-    public function dictForm(): DialogAction
+    /**
+     * 班级管理-弹窗
+     * @return DialogAction
+     */
+    public function classesAction(): DialogAction
     {
         $form = $this->baseForm()->api($this->getStorePath())->data([
             'enabled' => true,
             'sort'    => 0,
         ])->body([
-            amis()->TextControl()->name('value')->label()->clearable()->required()->maxLength(255),
-            amis()->TextControl()->name('key')->label()->clearable()->required()->maxLength(255),
-            amis()->SwitchControl()->name('enabled')->label(),
+            amis()->SelectControl('school_id', '学校')
+                ->options($this->service->getSchoolAll())
+                ->searchable()
+                ->clearable()
+                ->required(),
+            amis()->SelectControl('grade_id', '年级')
+                ->source(admin_url('biz/school/${school_id||0}/grade'))
+                ->selectMode('group')
+                ->searchable()
+                ->clearable()
+                ->disabledOn('${!school_id}')
+                ->required(),
+            amis()->TextControl('classes_id','班级')
+                ->maxLength(50)
+                ->clearable()
+                ->disabledOn('${!grade_id}')
+                ->required(),
+            amis()->SwitchControl('enabled','状态')
+                ->onText('开启')
+                ->offText('禁用'),
         ]);
 
         $createButton = amis()->DialogAction()
@@ -393,7 +417,7 @@ class StudentController extends AdminController
                     ->bulkActions([$this->bulkDeleteButton()])
                     ->perPageAvailable([10, 20, 30, 50, 100, 200])
                     ->footerToolbar(['switch-per-page', 'statistics', 'pagination'])
-                    ->api($this->getListGetDataPath() . '&_type=1')
+                    ->api(admin_url('biz/school/classes?_action=getData'))
                     ->headerToolbar([
                         $createButton,
                         'bulkActions',
@@ -401,14 +425,20 @@ class StudentController extends AdminController
                         amis('filter-toggler')->set('align','right'),
                     ])
                     ->filter(
-                        $this->baseFilter()->data(['_type' => 1])->body([
-                            amis()->TextControl()->name('type_key')->label()->clearable()->size('md'),
-                            amis()->TextControl()->name('type_value')->label()->clearable()->size('md'),
-                            amis()->SelectControl()
-                                ->name('type_enabled')
-                                ->label()
-                                ->size('md')
+                        $this->baseFilter()->body([
+                            amis()->SelectControl('school_id','学校')
+                                ->options($this->service->getSchoolAll())
+                                ->searchable()
                                 ->clearable()
+                                ->size('md'),
+                            amis()->SelectControl('grade_id','年级')
+                                ->searchable()
+                                ->clearable()
+                                ->size('sm'),
+                            amis()->TextControl('classes_name','班级')
+                                ->clearable()
+                                ->size('sm'),
+                            amis()->CheckboxesControl('status','状态')
                                 ->options([
                                     '1' => '是',
                                     '0' => '否',
@@ -416,12 +446,12 @@ class StudentController extends AdminController
                         ])
                     )
                     ->columns([
-                        amis()->TableColumn()->name('value')->label(),
-                        amis()->TableColumn()->name('key')->label(),
-                        amis()->TableColumn()
-                            ->name('enabled')
-                            ->label()
-                            ->type('status'),
+                        amis()->TableColumn('school.school.id', '学校'),
+                        amis()->TableColumn('school.grade.id', '年级'),
+                        amis()->TableColumn('classes_name','班级'),
+                        amis()->TableColumn('status','状态')
+                            ->set('type','status')
+                            ->set('options',['1' => '是', '0' => '否']),
                         amis()->Operation()->label(__('admin.actions'))->buttons([
                             $editButton,
                             $this->rowDeleteButton(),

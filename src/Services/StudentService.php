@@ -72,7 +72,7 @@ class StudentService extends AdminService
     public function getClassesAll(): array
     {
         $model = new Classes;
-        return $model->query()->get(['id as value','class_name as label'])->toArray();
+        return $model->query()->get(['id as value','classes_name as label'])->toArray();
     }
 
 }

@@ -2,8 +2,6 @@
 
 namespace DagaSmart\School\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\hasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
@@ -15,6 +13,24 @@ class SchoolGradeClasses extends Model
 
     public $timestamps = false;
 
+
+    /**
+     * 年级
+     * @return HasOne
+     */
+    public function grade(): hasOne
+    {
+        return $this->hasOne(Grade::class, 'id', 'grade_id')->select(['id', 'grade_name']);
+    }
+
+    /**
+     * 学校
+     * @return HasOne
+     */
+    public function school(): hasOne
+    {
+        return $this->hasOne(School::class, 'id', 'school_id')->select(['id', 'school_name']);
+    }
 
 
 }
