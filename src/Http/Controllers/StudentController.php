@@ -407,8 +407,8 @@ class StudentController extends AdminController
             ->icon('fa-regular fa-pen-to-square')
             ->level('link');
 
-        return amis()->DialogAction()->label('班级管理')->dialog(
-            amis()->Dialog()->title('班级管理')->size('lg')->actions([])->body(
+        return amis()->DialogAction()->label('班级管理')->icon('fa fa-slideshare')->dialog(
+            amis()->Dialog()->title('班级管理')->size('md')->actions([])->body(
                 amis()->CRUDTable()
                     ->perPage(10)
                     ->affixHeader(false)
@@ -426,16 +426,15 @@ class StudentController extends AdminController
                     ])
                     ->filter(
                         $this->baseFilter()->body([
-                            amis()->SelectControl('school_id','学校')
+                            amis()->SelectControl('school_id', '学校')
                                 ->options($this->service->getSchoolAll())
                                 ->searchable()
                                 ->clearable()
                                 ->size('md'),
-                            amis()->SelectControl('grade_id','年级')
+                            amis()->SelectControl('grade_id', '年级')
+                                ->source(admin_url('biz/school/${school_id||0}/grade'))
+                                ->selectMode('group')
                                 ->searchable()
-                                ->clearable()
-                                ->size('sm'),
-                            amis()->TextControl('classes_name','班级')
                                 ->clearable()
                                 ->size('sm'),
                             amis()->CheckboxesControl('status','状态')
