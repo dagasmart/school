@@ -30,17 +30,27 @@ class StudentService extends AdminService
         }
     }
 
-    public function saving(&$data, $primaryKey = ''): void
+    /**
+     * 新增或修改后更新关联数据
+     * @param $model
+     * @param $isEdit
+     * @return void
+     */
+    public function saved($model, $isEdit = false): void
     {
-        $params = [
-            'school_id' => $data['school_id'],
-            'grade_id' => $data['grade_id'],
-            'classes_id' => $data['classes_id'],
-            'student_id' => $data['id']
+        parent::saved($model, $isEdit);
+        $request = request()->all();
+        $data = [
+            'school_id' => $request['school_id'],
+            'grade_id' => $request['grade_id'],
+            'classes_id' => $request['classes_id'],
+            'student_id' => $model->id
         ];
-        admin_transaction(function () use ($params) {
-            SchoolGradeClassesStudent::query()->where('student_id', $params['student_id'])->delete();
-            SchoolGradeClassesStudent::query()->insert($params);
+        admin_transaction(function () use ($data) {
+            if ($data['classes_id']) {
+                SchoolGradeClassesStudent::query()->where('student_id', $data['student_id'])->delete();
+            }
+            SchoolGradeClassesStudent::query()->insert($data);
         });
     }
 
@@ -61,7 +71,7 @@ class StudentService extends AdminService
     public function getGradeAll(): array
     {
         $model = new Grade;
-        $data = $model->query()->get(['id as value','grade_name as label', 'grade_no as id', 'parent_id'])->toArray();
+        $data = $model->query()->get(['id as value','grade_name as label', 'id', 'parent_id'])->toArray();
         return array2tree($data);
     }
 

@@ -45,7 +45,7 @@ class Student extends Model
         return [['value'=>1, 'label'=>'男'], ['value'=>2, 'label'=>'女']];
     }
 
-    public function school(): hasOne
+    public function rel(): hasOne
     {
         return $this->hasOne(SchoolGradeClassesStudent::class)->with(['classes','grade','school']);
     }

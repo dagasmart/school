@@ -22,7 +22,7 @@ class ClassesController extends AdminController
 		$crud = $this->baseCRUD()
 			->filterTogglable(false)
 			->headerToolbar([
-				$this->createButton('dialog'),
+				$this->createButton('dialog',250),
 				...$this->baseHeaderToolBar()
 			])
             ->autoGenerateFilter()
@@ -32,49 +32,22 @@ class ClassesController extends AdminController
             ->autoFillHeight(true)
             ->columns([
                 amis()->TableColumn('id', 'ID')->sortable()->set('fixed','left'),
-                amis()->TableColumn('name', '')->sortable()->searchable()->set('fixed','left'),
-                amis()->TableColumn('school_name', '所属学校')
-                    ->searchable(['type'=>'select', 'searchable'=>true, 'options'=>$this->service->schoolData()])
-                    //->breakpoint('*')
-                    ->set('type','tpl')
-                    ->tpl('${bind[0].school.school_name}')
-                    ->set('fixed','left'),
-                amis()->TableColumn('duties','教师职务')->sortable(),
-                amis()->TableColumn('staff_sn','教师编码')->sortable(),
-                amis()->TableColumn('face_img', '老师照片')
-                    ->set('src','${face_img}')
-                    ->set('type','avatar')
-                    ->set('fit','cover')
-                    ->set('size',60)
-                    ->set('onError','return true;')
-                    ->set('onEvent', [
-                        'click' => [
-                            'actions' => [
-                                [
-                                    'actionType' => 'drawer',
-                                    'drawer' => [
-                                        'title' => false,
-                                        'actions' => [],
-                                        'closeOnEsc' => true, //esc键关闭
-                                        'closeOnOutside' => true, //域外可关闭
-                                        'showCloseButton' => false, //显示关闭
-                                        'body' => [
-                                            amis()->Image()
-                                                ->src('${face_img}')
-                                                ->defaultImage('/admin-assets/no-error.svg')
-                                                ->width('100%')
-                                                ->height('100%'),
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]),
-                amis()->TableColumn('id_number', '身份证号')->searchable(),
-                amis()->TableColumn('mobile', '联系电话')->searchable(),
-                amis()->TableColumn('alipay_user_id', '支付宝刷脸账号')->searchable(),
+                amis()->TableColumn('rel.school.school_name', '学校')
+                    ->searchable([
+                        'name' => 'school_id',
+                        'type' => 'select',
+                        'multiple' => true,
+                        'searchable' => true,
+                        'options' => $this->service->getSchoolAll(),
+                    ])
+                    ->width(200),
+                amis()->TableColumn('rel.grade.grade_name', '年级')->width(100),
+                amis()->TableColumn('classes_name','班级')->sortable(),
+                amis()->TableColumn('status', '状态')
+                    ->set('type','status')
+                    ->searchable(),
                 amis()->TableColumn('updatetime', '更新时间')->type('datetime')->width(150),
-                $this->rowActions('dialog')
+                $this->rowActions('dialog',250)
                     ->set('align','center')
                     ->set('fixed','right')
                     ->set('width',150)
@@ -97,47 +70,57 @@ class ClassesController extends AdminController
 	public function form($isEdit = false): Form
     {
 		return $this->baseForm()->body([
-			amis()->SelectControl('school_id', '选择学校')
-                ->options($this->service->schoolData())
+            amis()->StaticExactControl('id','ID')->visibleOn('${id}'),
+            amis()->SelectControl('school_id', '学校')
+                ->options($this->service->getSchoolAll())
                 ->searchable()
+                ->clearable()
                 ->required(),
-			amis()->TreeSelectControl('grade_id', '选择年级')
-                ->options()
+            amis()->SelectControl('grade_id', '年级')
+                ->source(admin_url('biz/school/${school_id||0}/grade'))
+                ->selectMode('group')
                 ->searchable()
-                ->onlyLeaf()
+                ->clearable()
+                ->disabledOn('${!school_id}')
                 ->required(),
-            amis()->TextControl('classes_code', '班级编码'),
-            amis()->TextControl('classes_name', '班级名称'),
-			amis()->TextControl('leader_teacher', '班主任'),
-			amis()->TextControl('contacts_email', '联系邮件'),
-			amis()->TextControl('type', '学校类型'),
-			amis()->TextControl('map_address', '学校地址'),
-			amis()->TextControl('location', '位置定位'),
-			amis()->TextControl('register_time', '注册日期'),
-			amis()->TextControl('credit_code', '信用代码'),
-			amis()->TextControl('legal_person', '学校法人'),
+            amis()->TextControl('classes_name','班级')
+                ->maxLength(50)
+                ->clearable()
+                ->disabledOn('${!grade_id}')
+                ->required(),
+            amis()->NumberControl('sort','排序')->size('xs'),
+            amis()->SwitchControl('status','状态')
+                ->onText('开启')
+                ->offText('禁用')
+                ->value(true),
 		]);
 	}
 
 	public function detail(): Form
     {
 		return $this->baseDetail()->body([
-			amis()->TextControl('id', 'ID')->static(),
-			amis()->TextControl('school_code', '学校代码')->static(),
-			amis()->TextControl('school_name', '学校名称')->static(),
-			amis()->TextControl('school_logo', '学校标志')->static(),
-			amis()->TextControl('area_id', '所属地区id')->static(),
-			amis()->TextControl('contacts_mobile', '联系电话')->static(),
-			amis()->TextControl('contacts_email', '联系邮件')->static(),
-			amis()->TextControl('type', '学校类型')->static(),
-			amis()->TextControl('map_address', '学校地址')->static(),
-			amis()->TextControl('location', '位置定位')->static(),
-			amis()->TextControl('register_time', '注册日期')->static(),
-			amis()->TextControl('credit_code', '信用代码')->static(),
-			amis()->TextControl('legal_person', '学校法人')->static(),
-//			amis()->TextControl('created_at', admin_trans('admin.created_at'))->static(),
-//			amis()->TextControl('updated_at', admin_trans('admin.updated_at'))->static(),
-		]);
+            amis()->StaticExactControl('id','ID')->visibleOn('${id}'),
+            amis()->SelectControl('school_id', '学校')
+                ->options($this->service->getSchoolAll())
+                ->searchable()
+                ->clearable()
+                ->required(),
+            amis()->SelectControl('grade_id', '年级')
+                ->source(admin_url('biz/school/${school_id||0}/grade'))
+                ->selectMode('group')
+                ->searchable()
+                ->clearable()
+                ->required(),
+            amis()->TextControl('classes_name','班级')
+                ->maxLength(50)
+                ->clearable()
+                ->required(),
+            amis()->NumberControl('sort','排序')->size('xs'),
+            amis()->SwitchControl('status','状态')
+                ->onText('开启')
+                ->offText('禁用')
+                ->value(true),
+		])->static();
 	}
 
     /**

@@ -30,11 +30,33 @@ class ClassesService extends AdminService
         }
     }
 
+    /**
+     * 新增或修改后更新关联数据
+     * @param $model
+     * @param $isEdit
+     * @return void
+     */
+    public function saved($model, $isEdit = false)
+    {
+        parent::saved($model, $isEdit);
+        $request = request()->all();
+        $data = [
+            'school_id' => $request['school_id'],
+            'grade_id' => $request['grade_id'],
+            'classes_id' => $model->id
+        ];
+        admin_transaction(function () use ($data) {
+            if ($data['classes_id']) {
+            SchoolGradeClasses::query()->where('classes_id', $data['classes_id'])->delete();
+            }
+            SchoolGradeClasses::query()->insert($data);
+        });
+    }
 
     /**
      * 学校列表
      */
-    public function schoolData()
+    public function getSchoolAll()
     {
         return (new StudentService)->getSchoolAll();
     }

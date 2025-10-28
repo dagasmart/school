@@ -113,13 +113,16 @@ class SchoolController extends AdminController
             amis()->Tab()->title('基本信息')->body([
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->GroupControl()->direction('vertical')->body([
-                        amis()->TextControl('school_name', '学校名称'),
+                        amis()->TextControl('school_name', '学校名称')->required(),
                         amis()->TextControl('school_code', '学校代码'),
                         amis()->SelectControl('school_nature', '学校性质')
-                            ->options(Enum::Nature),
+                            ->options(Enum::Nature)
+                            ->required(),
                         amis()->SelectControl('school_mode', '办学模式')
-                            ->options($this->service->getStageAll()),
-                        amis()->DateControl('register_time', '注册日期'),
+                            ->options($this->service->getStageAll())
+                            ->required(),
+                        amis()->DateControl('register_time', '注册日期')
+                            ->required(),
                     ]),
                     amis()->GroupControl()->direction('vertical')->body([
                         amis()->ImageControl('school_logo',false)
@@ -144,12 +147,14 @@ class SchoolController extends AdminController
                 ]),
                 amis()->Divider(),
                 amis()->GroupControl()->direction('horizontal')->body([
-                    amis()->TextControl('credit_code', '信用代码'),
+                    amis()->TextControl('credit_code', '信用代码')
+                        ->required(),
                     amis()->TextControl('legal_person', '学校法人'),
                 ]),
                 amis()->Divider(),
                 amis()->GroupControl()->mode('horizontal')->body([
-                    amis()->TextControl('contacts_mobile', '联系电话'),
+                    amis()->TextControl('contacts_mobile', '联系电话')
+                        ->required(),
                     amis()->TextControl('contacts_email', '联系邮件'),
                 ]),
                 amis()->Divider(),

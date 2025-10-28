@@ -17,7 +17,7 @@ class Classes extends Model
     public $timestamps = false;
 
 
-    public function school(): hasOne
+    public function rel(): hasOne
     {
         return $this->hasOne(SchoolGradeClasses::class)->with(['grade','school']);
     }
