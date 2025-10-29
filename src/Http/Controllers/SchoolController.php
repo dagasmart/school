@@ -310,12 +310,10 @@ class SchoolController extends AdminController
         return $this->baseForm()->body([
             amis()->Alert()
                 ->showIcon()
+                ->showCloseButton()
                 ->style([
                     'padding' => '0.5rem',
-                    'color' => 'var(--colors-brand-6)',
                     'borderStyle' => 'dashed',
-                    'borderColor' => 'var(--colors-brand-6)',
-                    'backgroundColor' => 'var(--Tree-item-onChekced-bg)',
                 ])
                 ->body('提示：<p>1.授权给角色时，角色下所有用户可以访问；</p><p>2.授权给用户时，只有授权用户可访问。</p>'),
             amis()->TextControl('id', 'ID')->static(),
