@@ -33,10 +33,10 @@ class ClassesService extends AdminService
     /**
      * 新增或修改后更新关联数据
      * @param $model
-     * @param $isEdit
+     * @param bool $isEdit
      * @return void
      */
-    public function saved($model, $isEdit = false)
+    public function saved($model, $isEdit = false): void
     {
         parent::saved($model, $isEdit);
         $request = request()->all();
@@ -56,7 +56,7 @@ class ClassesService extends AdminService
     /**
      * 学校列表
      */
-    public function getSchoolAll()
+    public function getSchoolAll(): array
     {
         return (new StudentService)->getSchoolAll();
     }

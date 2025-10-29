@@ -191,22 +191,50 @@ class StudentController extends AdminController
                 ]),
             ]),
 
-//            // 基本信息
-//            amis()->Tab()->title(admin_trans('admin.code_generators.base_info'))->body([
-//                amis()->GroupControl()->mode('normal')->body([
-//                    amis()->TextControl('mobile', '电话'),
-//                    amis()->TextControl('parent_mobile', '家长电话'),
-//                    amis()->TextControl('live_school', '是否住校1 是 2否'),
-//                    amis()->TextControl('remark', '备注'),
-//                    amis()->TextControl('hk', '户口类型'),
-//                    amis()->TextControl('face_img', '人脸识别照片'),
-//                    amis()->TextControl('graduate_status', '是否毕业 1是 2否'),
-//                    amis()->TextControl('food_card_expire', '饭卡过期 1是 2否'),
-//                    amis()->TextControl('have_face_pay', '已开通刷脸支付 1是2否'),
-//                    amis()->TextControl('have_pay_photo', '已采集支付照片 1是 2否'),
-//                    amis()->TextControl('is_free', '是否免缴服务费 1是 2否'),
-//                ]),
-//            ]),
+            // 家庭情况
+            amis()->Tab()->title('家庭情况')->body([
+                amis()->InputCityControl('region_id', '所在地区')
+                    ->searchable()
+                    ->extractValue(false)
+                    ->onEvent([
+                        'change' => [
+                            'actions' => [
+                                [
+                                    'actionType'  => 'setValue',
+                                    'componentId' => 'form_region_info',
+                                    'args'        => [
+                                        'value' => '${value}'
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ]),
+                amis()->GroupControl()->mode('horizontal')->body([
+                    amis()->TextControl('address', '家庭住址'),
+                    amis()->TextControl('email', '常用邮箱'),
+                ]),
+                amis()->HiddenControl('region_info', '地区信息')->id('form_region_info'),
+                amis()->TextControl('address_info', '详细地址')
+                    ->value('${region_info.province} ${region_info.city} ${region_info.district} ${address}')
+                    ->static(),
+                amis()->Divider()->title('家庭成员')->titlePosition('left'),
+                amis()->ComboControl('family', false)->items([
+                    amis()->TextControl('family_name', '${index+1}.姓名')
+                        ->clearable()
+                        ->required(),
+                    amis()->SelectControl('family_ties', '关系')
+                        ->options(Enum::family())
+                        ->clearable()
+                        ->required(),
+                    amis()->TextControl('family_mobile','电话')->clearable(),
+                ])
+                    ->className('border-gray-100 border-dashed')
+                    ->mode('horizontal')
+                    ->multiLine(false)
+                    ->multiple()
+                    ->strictMode(false)
+                    ->removable(),
+            ]),
 //
 //            // 基本信息
 //            amis()->Tab()->title(admin_trans('admin.code_generators.base_info'))->body([
@@ -234,8 +262,8 @@ class StudentController extends AdminController
 		]);
 	}
 
-	public function detail()
-	{
+	public function detail(): Form
+    {
 		return $this->baseDetail()->mode('horizontal')->tabs([
 
             // 基本信息

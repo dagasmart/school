@@ -60,6 +60,13 @@ class Teacher extends Model
         return admin_sensitive($value, 3,5);
     }
 
+    public function setMobileAttribute($value): void
+    {
+        if ($value && !strpos($value, '*')) {
+            $this->attributes['mobile'] = $value;
+        }
+    }
+
     /**
      * 身份证号脱敏
      * @param $value
@@ -69,6 +76,14 @@ class Teacher extends Model
     {
         return admin_sensitive($value, 6,8);
     }
+
+    public function setIdCardAttribute($value): void
+    {
+        if ($value && !strpos($value, '*')) {
+            $this->attributes['id_card'] = $value;
+        }
+    }
+
 
     public function schoolThrough(): HasManyThrough
     {

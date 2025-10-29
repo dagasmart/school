@@ -30,10 +30,26 @@ class StudentService extends AdminService
         }
     }
 
+    public function saving(&$data, $primaryKey = ''): void
+    {
+        //地区代码
+        $data['region_id'] = is_array($data['region_id']) ? $data['region_id']['code'] : $data['region_id'];
+        //手机号码
+        $mobile = $data['mobile'] ?? null;
+        if ($mobile && strpos($mobile, '*')) {
+            unset($data['mobile']);
+        }
+        //身份证号
+        $id_card = $data['id_card'] ?? null;
+        if ($id_card && strpos($id_card, '*')) {
+            unset($data['id_card']);
+        }
+    }
+
     /**
      * 新增或修改后更新关联数据
      * @param $model
-     * @param $isEdit
+     * @param bool $isEdit
      * @return void
      */
     public function saved($model, $isEdit = false): void

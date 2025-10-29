@@ -24,6 +24,25 @@ class Student extends Model
         return admin_sensitive($value, 6, 8);
     }
 
+    public function setIdCardAttribute($value): void
+    {
+        if ($value && !strpos($value, '*')) {
+            $this->attributes['id_card'] = $value;
+        }
+    }
+
+    public function getMobileAttribute($value): string
+    {
+        return admin_sensitive($value, 3, 4);
+    }
+
+    public function setMobileAttribute($value): void
+    {
+        if ($value && !strpos($value, '*')) {
+            $this->attributes['mobile'] = $value;
+        }
+    }
+
     public function getStudentCodeAttribute(): string
     {
         return 'G' . $this->id_card;
@@ -34,10 +53,10 @@ class Student extends Model
         return env('APP_URL') . $value;
     }
 
-    public function setAvatarAttribute($value): string
+    public function setAvatarAttribute($value): void
     {
         $avatar = str_replace(env('APP_URL') . Storage::url(''), '', $value);
-        return Storage::url($avatar);
+        $this->attributes['avatar'] = Storage::url($avatar);
     }
 
     public function sexOption(): array

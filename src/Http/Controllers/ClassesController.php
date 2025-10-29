@@ -46,22 +46,11 @@ class ClassesController extends AdminController
                 amis()->TableColumn('status', '状态')
                     ->set('type','status')
                     ->searchable(),
-                amis()->TableColumn('updatetime', '更新时间')->type('datetime')->width(150),
+                amis()->TableColumn('updated_at', '更新时间')->type('datetime')->width(150),
                 $this->rowActions('dialog',250)
                     ->set('align','center')
                     ->set('fixed','right')
                     ->set('width',150)
-            ])
-            ->affixRow([
-                [
-                    'type' => 'text',
-                    'text' => '总计',
-                    "colSpan" => 3,
-                ],
-                [
-                    'type' => 'tpl',
-                    "tpl" => '${rows|pick:mobile|sum}'
-                ]
             ]);
 
 		return $this->baseList($crud);
@@ -73,20 +62,22 @@ class ClassesController extends AdminController
             amis()->StaticExactControl('id','ID')->visibleOn('${id}'),
             amis()->SelectControl('school_id', '学校')
                 ->options($this->service->getSchoolAll())
+                ->value('${rel.school_id}')
                 ->searchable()
                 ->clearable()
                 ->required(),
             amis()->SelectControl('grade_id', '年级')
                 ->source(admin_url('biz/school/${school_id||0}/grade'))
+                ->value('${rel.grade_id}')
                 ->selectMode('group')
+                ->disabledOn('${!school_id}')
                 ->searchable()
                 ->clearable()
-                ->disabledOn('${!school_id}')
                 ->required(),
             amis()->TextControl('classes_name','班级')
+                ->disabledOn('${!grade_id}')
                 ->maxLength(50)
                 ->clearable()
-                ->disabledOn('${!grade_id}')
                 ->required(),
             amis()->NumberControl('sort','排序')->size('xs'),
             amis()->SwitchControl('status','状态')
@@ -122,16 +113,6 @@ class ClassesController extends AdminController
                 ->value(true),
 		])->static();
 	}
-
-    /**
-     * 学校年级班级列表
-     */
-    public function data()
-    {
-        admin_abort(1223);
-    }
-
-
 
     /**
      * 学校年级班级列表

@@ -14,7 +14,7 @@ class Classes extends Model
 	protected $table = 'biz_classes';
     protected $primaryKey = 'id';
 
-    public $timestamps = false;
+    public $timestamps = true;
 
 
     public function rel(): hasOne
