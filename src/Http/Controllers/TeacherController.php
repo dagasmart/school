@@ -50,20 +50,25 @@ class TeacherController extends AdminController
             ->columns([
                 amis()->TableColumn('id', 'ID')->sortable()->set('fixed','left'),
                 amis()->TableColumn('teacher_name', '老师姓名')->sortable()->searchable()->set('fixed','left'),
-                amis()->TableColumn('school', '所属学校')
-                    ->searchable(['type'=>'select', 'searchable'=>true, 'options'=>$this->service->schoolData()])
+                amis()->TableColumn('school.school_id', '所属学校')
+                    ->searchable(['type'=>'tree-select', 'searchable'=>true, 'options'=>$this->service->getSchoolAll()])
                     //->breakpoint('*')
                     ->set('type','input-tag')
-                    ->set('options',$this->service->schoolData())
-                    //->set('value', '${ school }')
+                    ->set('options',$this->service->getSchoolAll())
                     ->set('fixed','left')
                     ->set('static', true),
-                amis()->TableColumn('job_id', '教师职务')
-                    ->searchable(['type'=>'tree-select', 'multiple'=>true, 'searchable'=>true, 'options'=>$this->service->jobOption()])
-                    ->set('type', 'input-tree')
-                    ->set('options', $this->service->jobOption())
+                amis()->TableColumn('school.department_id', '部门')
+                    ->searchable(['type'=>'tree-select', 'multiple'=>true, 'searchable'=>true, 'options'=>$this->service->getDepartmentAll()])
+                    ->set('type', 'input-tag')
+                    ->set('options', $this->service->getDepartmentAll())
                     ->set('multiple', true)
-                    ->set('value', '${ job.job_id }')
+                    ->set('width', 150)
+                    ->set('static', true),
+                amis()->TableColumn('school.job_id', '教师职务')
+                    ->searchable(['type'=>'tree-select', 'multiple'=>true, 'searchable'=>true, 'options'=>$this->service->getJobAll()])
+                    ->set('type', 'input-tag')
+                    ->set('options', $this->service->getJobAll())
+                    ->set('multiple', true)
                     ->set('width', 150)
                     ->set('static', true),
                 amis()->TableColumn('teacher_no','教师编码')->searchable()->sortable(),
@@ -171,16 +176,27 @@ class TeacherController extends AdminController
             ]),
             // 学校信息
             amis()->Tab()->title('学校信息')->body([
-                amis()->ComboControl('school', false)->items([
+                amis()->ComboControl('combo', false)->items([
                     amis()->SelectControl('school_id', '学校${index+1}')
-                        ->options($this->service->schoolData())->required(),
+                        ->options($this->service->getSchoolAll())
+                        ->searchable()
+                        ->required(),
                     amis()->HiddenControl('teacher_id')->value('${id}'),
+                    amis()->TreeSelectControl('department_id', '部门')
+                        ->options($this->service->getDepartmentAll())
+                        ->onlyChildren()
+                        ->onlyLeaf()
+                        ->hideNodePathLabel()
+                        ->searchable()
+                        ->required(),
                     amis()->TreeSelectControl('job_id', '职务')
-                        ->options($this->service->jobOption())
+                        ->options($this->service->getJobAll())
                         ->menuTpl('<div class="flex justify-between"><span style="color: var(--button-link-default-font-color);">${label}</span><span class="ml-2 rounded p-1 text-xs text-gray-500 text-center w-full">${tag}</span></div>')
-                        ->multiple()
+                        ->multiple(false)
                         ->maxTagCount(5)
                         ->onlyChildren()
+                        ->onlyLeaf()
+                        ->hideNodePathLabel()
                         ->searchable()
                         ->required(),
                 ])
@@ -298,12 +314,19 @@ class TeacherController extends AdminController
             ]),
             // 家庭情况
             amis()->Tab()->title('学校信息')->body([
-                amis()->ComboControl('school', false)->items([
+                amis()->ComboControl('combo', false)->items([
                     amis()->SelectControl('school_id', '学校${index+1}')
-                        ->options($this->service->schoolData())->required(),
+                        ->options($this->service->getSchoolAll())->required(),
                     amis()->HiddenControl('teacher_id')->value('${id}'),
+                    amis()->TreeSelectControl('department_id', '部门')
+                        ->options($this->service->getDepartmentAll())
+                        ->onlyChildren()
+                        ->onlyLeaf()
+                        ->hideNodePathLabel()
+                        ->searchable()
+                        ->required(),
                     amis()->TreeSelectControl('job_id', '职务')
-                        ->options($this->service->jobOption())
+                        ->options($this->service->getJobAll())
                         ->menuTpl('<div class="flex justify-between"><span style="color: var(--button-link-default-font-color);">${label}</span><span class="ml-2 rounded p-1 text-xs text-gray-500 text-center w-full">${tag}</span></div>')
                         ->multiple()
                         ->maxTagCount(5)
@@ -504,7 +527,7 @@ class TeacherController extends AdminController
                 ->clearable()
                 ->disabledOn('${!school_id}')
                 ->required(),
-            amis()->TextControl('classes_name','部门名称')
+            amis()->TextControl('department_name','部门名称')
                 ->maxLength(50)
                 ->clearable()
                 ->disabledOn('${!grade_id}')
@@ -556,7 +579,7 @@ class TeacherController extends AdminController
                                 ->searchable()
                                 ->clearable()
                                 ->size('md'),
-                            amis()->SelectControl('grade_id', '部门')
+                            amis()->SelectControl('department_name', '部门')
                                 ->source(admin_url('biz/school/${school_id||0}/grade'))
                                 ->selectMode('group')
                                 ->searchable()
@@ -571,7 +594,7 @@ class TeacherController extends AdminController
                     )
                     ->columns([
                         amis()->TableColumn('id','ID')->sortable(),
-                        amis()->TableColumn('classes_name','班级'),
+                        amis()->TableColumn('department_name','班级'),
                         amis()->TableColumn('rel.grade.grade_name', '年级'),
                         amis()->TableColumn('rel.school.school_name', '学校'),
                         amis()->TableColumn('status','状态')

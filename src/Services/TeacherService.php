@@ -2,6 +2,7 @@
 
 namespace DagaSmart\School\Services;
 
+use DagaSmart\School\Models\Department;
 use DagaSmart\School\Models\Job;
 use DagaSmart\School\Models\School;
 use DagaSmart\School\Models\Teacher;
@@ -23,7 +24,7 @@ class TeacherService extends AdminService
     public function loadRelations($query): void
     {
         //Job::initialize();
-        $query->with(['school','job']);
+        $query->with(['school','rel','combo']);
     }
 
     public function searchable($query): void
@@ -74,14 +75,16 @@ class TeacherService extends AdminService
     {
         return admin_transaction(function () use ($primaryKey, $data) {
             $schoolJobs = [];
-            if ($data['school']) {
-                array_walk($data['school'], function ($item) use (&$schoolJobs) {
+            if ($data['combo']) {
+                array_walk($data['combo'], function ($item) use (&$schoolJobs) {
                     $school_id = $item['school_id'];
+                    $department_id = $item['department_id'];
                     $teacher_id = $item['teacher_id'];
                     $jobs = explode(',', $item['job_id']);
-                    array_walk($jobs, function ($value) use (&$schoolJobs, $school_id, $teacher_id) {
+                    array_walk($jobs, function ($value) use (&$schoolJobs, $school_id, $department_id, $teacher_id) {
                         $schoolJobs[] = [
                             'school_id' => $school_id,
+                            'department_id' => $department_id,
                             'teacher_id' => $teacher_id,
                             'job_id' => $value
                         ];
@@ -105,19 +108,6 @@ class TeacherService extends AdminService
     }
 
     /**
-     * 职务列表
-     */
-    public function jobOption(): array
-    {
-        $list = Job::query()
-            ->select(admin_raw('*, label_name as label, id as value'))
-            ->orderBy('sort')
-            ->get()
-            ->toArray();
-        return array2tree($list, 0);
-    }
-
-    /**
      * 学校列表
      * @return array
      */
@@ -126,5 +116,33 @@ class TeacherService extends AdminService
         $model = new School;
         return $model->query()->whereNull('deleted_at')->get(['id as value','school_name as label'])->toArray();
     }
-    
+
+    /**
+     * 部门列表
+     * @return array
+     */
+    public function getDepartmentAll(): array
+    {
+        $model = new Department;
+        $res = $model->query()
+            ->select(admin_raw('*, department_name as label, id as value'))
+            ->orderBy('sort')
+            ->get()
+            ->toArray();
+        return array2tree($res, 0);
+    }
+
+    /**
+     * 职务列表
+     */
+    public function getJobAll(): array
+    {
+        $list = Job::query()
+            ->select(admin_raw('*, job_name as label, id as value'))
+            ->orderBy('sort')
+            ->get()
+            ->toArray();
+        return array2tree($list, 0);
+    }
+
 }

@@ -95,17 +95,36 @@ class Teacher extends Model
         )->select(admin_raw("id as value, school_name as label"));
     }
 
-    public function school(): HasMany
+    public function rel(): hasOne
     {
-        return $this->hasMany(SchoolTeacherJob::class,
+        return $this->hasOne(SchoolDepartmentTeacherJob::class)->with(['job','department','school']);
+    }
+
+    public function school(): HasOne
+    {
+        return $this->hasOne(SchoolDepartmentTeacherJob::class,
             'teacher_id',
             'id'
-        )->select(admin_raw("school_id,teacher_id,string_agg(job_id::varchar, ',') job_id,array_agg(job_id::varchar) job_ids,school_id as value"))->groupBy(['school_id', 'teacher_id']);
+            )->select(admin_raw("
+                teacher_id
+                ,string_agg (DISTINCT school_id::VARCHAR, ',' ) as school_id
+                ,string_agg (DISTINCT department_id::VARCHAR, ',' ) as department_id
+                ,string_agg (DISTINCT job_id::VARCHAR, ',' ) as job_id
+            "))
+            ->groupBy('teacher_id');
+    }
+
+    public function combo(): HasMany
+    {
+        return $this->hasMany(SchoolDepartmentTeacherJob::class,
+            'teacher_id',
+            'id'
+        )->select(admin_raw("school_id,department_id,teacher_id,job_id"));
     }
 
     public function job(): HasOne
     {
-        return $this->HasOne(SchoolTeacherJob::class,
+        return $this->HasOne(SchoolDepartmentTeacherJob::class,
             'teacher_id',
             'id'
             )
@@ -121,7 +140,7 @@ class Teacher extends Model
 
     public function jobs(): BelongsToMany
     {
-        return $this->belongsToMany(Job::class, SchoolTeacherJob::class, 'teacher_id', 'job_id');
+        return $this->belongsToMany(Job::class, SchoolDepartmentTeacherJob::class, 'teacher_id', 'job_id');
     }
 
 

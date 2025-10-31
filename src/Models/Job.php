@@ -5,7 +5,7 @@ namespace DagaSmart\School\Models;
 use DagaSmart\School\Enums\Enum;
 
 /**
- * 基础-学生表
+ * 基础-职务表
  */
 class Job extends Model
 {
@@ -25,7 +25,7 @@ class Job extends Model
         foreach ($jobs as $k => $job) {
             $data = [
                 'id' => $k+1,
-                'label_name' => $job['label'],
+                'job_name' => $job['label'],
                 'tag' => $job['tag'],
                 'parent_id' => 0,
                 'sort' => $k++,
@@ -34,7 +34,7 @@ class Job extends Model
             foreach ($job['children'] as $child) {
                 $ins = [
                     'id' => $child['value'],
-                    'label_name' => $child['label'],
+                    'job_name' => $child['label'],
                     'tag' => $child['tag'],
                     'parent_id' => $id,
                     'sort' => $k++
