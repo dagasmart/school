@@ -11,6 +11,7 @@ Route::group([
     $router->resource('school/teacher', Controllers\TeacherController::class);
     $router->resource('school/student', Controllers\StudentController::class);
     $router->resource('school/classes', Controllers\ClassesController::class);
+    $router->resource('school/department', Controllers\DepartmentController::class);
 
     $router->get('school/{school_id}/grade', [Controllers\GradeController::class, 'SchoolGrade']);
     $router->get('school/{school_id}/grade/{grade_id}/classes', [Controllers\ClassesController::class, 'SchoolGradeClasses']);

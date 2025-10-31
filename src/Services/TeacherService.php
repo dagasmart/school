@@ -3,6 +3,7 @@
 namespace DagaSmart\School\Services;
 
 use DagaSmart\School\Models\Job;
+use DagaSmart\School\Models\School;
 use DagaSmart\School\Models\Teacher;
 use DagaSmart\BizAdmin\Services\AdminService;
 use Illuminate\Database\Eloquent\Builder;
@@ -116,4 +117,14 @@ class TeacherService extends AdminService
         return array2tree($list, 0);
     }
 
+    /**
+     * 学校列表
+     * @return array
+     */
+    public function getSchoolAll(): array
+    {
+        $model = new School;
+        return $model->query()->whereNull('deleted_at')->get(['id as value','school_name as label'])->toArray();
+    }
+    
 }

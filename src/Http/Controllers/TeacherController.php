@@ -40,6 +40,7 @@ class TeacherController extends AdminController
 				...$this->baseHeaderToolBar(),
                 $this->importAction(admin_url('teacher/import')),
                 $this->exportAction(),
+                $this->departmentAction(),
 			])
             ->autoGenerateFilter()
             ->affixHeader()
@@ -475,6 +476,114 @@ class TeacherController extends AdminController
                 });
         }
 
+    }
+
+
+    /**
+     * 部门管理-弹窗
+     * @return DialogAction
+     */
+    public function departmentAction(): DialogAction
+    {
+        $form = $this->baseForm()->api('biz/school/department')->data([
+            'enabled' => true,
+            'sort'    => 0,
+        ])->body([
+            amis()->StaticExactControl('id','ID')->visibleOn('${id}'),
+            amis()->SelectControl('school_id', '学校')
+                ->options($this->service->getSchoolAll())
+                ->value('${rel.school_id}')
+                ->searchable()
+                ->clearable()
+                ->required(),
+            amis()->SelectControl('grade_id', '上级部门')
+                ->source(admin_url('biz/school/${school_id||0}/department'))
+                ->value('${rel.grade_id}')
+                ->selectMode('group')
+                ->searchable()
+                ->clearable()
+                ->disabledOn('${!school_id}')
+                ->required(),
+            amis()->TextControl('classes_name','部门名称')
+                ->maxLength(50)
+                ->clearable()
+                ->disabledOn('${!grade_id}')
+                ->required(),
+            amis()->NumberControl('sort','排序')->size('xs'),
+            amis()->SwitchControl('status','状态')
+                ->onText('开启')
+                ->offText('禁用')
+                ->value(true),
+        ]);
+
+        $createButton = amis()->DialogAction()
+            ->dialog(amis()->Dialog()->title(__('admin.create'))->body($form))
+            ->label(__('admin.create'))
+            ->icon('fa fa-add')
+            ->level('primary');
+
+        $editForm = (clone $form)
+            ->api('put:biz/school/classes/${id}');
+        //->initApi('biz/school/classes/${id}/edit?_action=getData');
+
+        $editButton = amis()->DialogAction()
+            ->dialog(amis()->Dialog()->title(__('admin.edit'))->body($editForm))
+            ->label(__('admin.edit'))
+            ->icon('fa-regular fa-pen-to-square')
+            ->level('link');
+
+        return amis()->DialogAction()->label('部门管理')->icon('fa fa-sitemap')->dialog(
+            amis()->Dialog()->title('部门管理')->size('md')->actions([])->body(
+                amis()->CRUDTable()
+                    ->perPage(10)
+                    ->affixHeader(false)
+                    ->filterTogglable()
+                    ->filterDefaultVisible(false)
+                    ->bulkActions([$this->bulkDeleteButton()])
+                    ->perPageAvailable([10, 20, 30, 50, 100, 200])
+                    ->footerToolbar(['switch-per-page', 'statistics', 'pagination'])
+                    ->api(admin_url('biz/school/department?_action=getData'))
+                    ->headerToolbar([
+                        $createButton,
+                        'bulkActions',
+                        amis('reload')->set('align','right'),
+                        amis('filter-toggler')->set('align','right'),
+                    ])
+                    ->filter(
+                        $this->baseFilter()->body([
+                            amis()->SelectControl('school_id', '学校')
+                                ->options($this->service->getSchoolAll())
+                                ->searchable()
+                                ->clearable()
+                                ->size('md'),
+                            amis()->SelectControl('grade_id', '部门')
+                                ->source(admin_url('biz/school/${school_id||0}/grade'))
+                                ->selectMode('group')
+                                ->searchable()
+                                ->clearable()
+                                ->size('sm'),
+                            amis()->CheckboxesControl('status','状态')
+                                ->options([
+                                    '1' => '是',
+                                    '0' => '否',
+                                ]),
+                        ])
+                    )
+                    ->columns([
+                        amis()->TableColumn('id','ID')->sortable(),
+                        amis()->TableColumn('classes_name','班级'),
+                        amis()->TableColumn('rel.grade.grade_name', '年级'),
+                        amis()->TableColumn('rel.school.school_name', '学校'),
+                        amis()->TableColumn('status','状态')
+                            ->set('type','status')
+                            ->set('options',['1' => '是', '0' => '否']),
+                        amis()->Operation()->label(__('admin.actions'))->buttons([
+                            $editButton,
+                            $this->rowDeleteButton(),
+                        ])->set('width', 150),
+                    ])
+            )
+        );
     }
 
 }

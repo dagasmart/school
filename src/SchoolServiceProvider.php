@@ -41,7 +41,7 @@ class SchoolServiceProvider extends ServiceProvider
         ],
         [
             'parent' => '基础维护',
-            'title' => '班级管理',
+            'title' => '部门管理',
             'url' => '/biz/school/classes',
             'url_type' => 1,
             'icon' => 'simple-icons:googleclassroom',
