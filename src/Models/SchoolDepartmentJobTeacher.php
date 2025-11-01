@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 /**
  * 基础-老师-职务表
  */
-class SchoolDepartmentTeacherJob extends Model
+class SchoolDepartmentJobTeacher extends Model
 {
-	protected $table = 'biz_school_department_teacher_job';
+	protected $table = 'biz_school_department_job_teacher';
 
     public $timestamps = false;
 

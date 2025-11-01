@@ -97,12 +97,12 @@ class Teacher extends Model
 
     public function rel(): hasOne
     {
-        return $this->hasOne(SchoolDepartmentTeacherJob::class)->with(['job','department','school']);
+        return $this->hasOne(SchoolDepartmentJobTeacher::class)->with(['job','department','school']);
     }
 
     public function school(): HasOne
     {
-        return $this->hasOne(SchoolDepartmentTeacherJob::class,
+        return $this->hasOne(SchoolDepartmentJobTeacher::class,
             'teacher_id',
             'id'
             )->select(admin_raw("
@@ -116,7 +116,7 @@ class Teacher extends Model
 
     public function combo(): HasMany
     {
-        return $this->hasMany(SchoolDepartmentTeacherJob::class,
+        return $this->hasMany(SchoolDepartmentJobTeacher::class,
             'teacher_id',
             'id'
         )->select(admin_raw("school_id,department_id,teacher_id,job_id"));
@@ -124,7 +124,7 @@ class Teacher extends Model
 
     public function job(): HasOne
     {
-        return $this->HasOne(SchoolDepartmentTeacherJob::class,
+        return $this->HasOne(SchoolDepartmentJobTeacher::class,
             'teacher_id',
             'id'
             )
@@ -140,7 +140,7 @@ class Teacher extends Model
 
     public function jobs(): BelongsToMany
     {
-        return $this->belongsToMany(Job::class, SchoolDepartmentTeacherJob::class, 'teacher_id', 'job_id');
+        return $this->belongsToMany(Job::class, SchoolDepartmentJobTeacher::class, 'teacher_id', 'job_id');
     }
 
 

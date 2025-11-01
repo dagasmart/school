@@ -12,7 +12,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * 基础-学生表
+ * 基础-年级表
  *
  * @property GradeService $service
  */
