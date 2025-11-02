@@ -4,6 +4,7 @@ namespace DagaSmart\School\Models;
 
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\hasOne;
 use Illuminate\Support\Facades\Storage;
 
@@ -72,6 +73,10 @@ class Student extends Model
     public function classes(): belongsToMany
     {
         return $this->belongsToMany(Classes::class, SchoolGradeClassesStudent::class, 'student_id', 'classes_id');
+    }
+    public function rel_school_grade_classes_student(): hasMany
+    {
+        return $this->hasMany(SchoolGradeClassesStudent::class, 'student_id', 'id');
     }
 
 }

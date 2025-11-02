@@ -70,6 +70,11 @@ class StudentService extends AdminService
         });
     }
 
+    public function deleted($ids): void
+    {
+        $this->getModel()->rel_school_grade_classes_student()->whereIn($this->primaryKey(), $ids)->delete();
+    }
+
     /**
      * 学校列表
      * @return array

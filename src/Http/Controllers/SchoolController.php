@@ -191,11 +191,12 @@ class SchoolController extends AdminController
                         ->required()
                 ])
             ]),
+
         ]);
 	}
 
-	public function detail()
-	{
+	public function detail(): Form
+    {
 		return $this->baseDetail()->mode('horizontal')->tabs([
             // 基本信息
             amis()->Tab()->title('基本信息')->body([

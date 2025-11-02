@@ -25,14 +25,6 @@ class Teacher extends Model
 
     public $timestamps = true;
 
-    public function bind(): hasMany
-    {
-        return $this->hasMany(SchoolTeacher::class, 'teacher_id', 'id')
-            ->with(['school' => function ($query) {
-                $query->select('id','school_name');
-            }]);
-    }
-
     /**
      * 头像
      * @param $value

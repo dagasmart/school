@@ -50,8 +50,14 @@ class SchoolService extends AdminService
         }
         //地区代码
         $data['region'] = is_array($data['region']) ? $data['region']['code'] : $data['region'];
-        //注册时间
-        $data['register_time'] = strtotime($data['register_time']);
+        //模块
+        if (admin_current_module()) {
+            $data['module'] = admin_current_module();
+        }
+        //商户
+        if (admin_mer_id()) {
+            $data['mer_id'] = admin_mer_id();
+        }
     }
 
     /**
