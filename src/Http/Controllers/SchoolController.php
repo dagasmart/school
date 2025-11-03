@@ -81,9 +81,10 @@ class SchoolController extends AdminController
                     ->set('width', 200),
                 amis()->TableColumn('location', '位置定位'),
                 amis()->TableColumn('register_time', '注册日期')
+                    ->quickEdit(['type'=>'input-date','value'=>'${register_time}'])
+                    ->set('type','date')
                     ->width(120)
-                    ->sortable()
-                    ->quickEdit(['type'=>'input-date','value'=>'${register_time}']),
+                    ->sortable(),
                 amis()->TableColumn('credit_code', '信用代码')->copyable(),
                 amis()->TableColumn('legal_person', '学校法人'),
                 amis()->TableColumn('contacts_mobile', '联系电话')->searchable(),

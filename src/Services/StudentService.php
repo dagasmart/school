@@ -8,8 +8,7 @@ use DagaSmart\School\Models\School;
 use DagaSmart\School\Models\SchoolGradeClassesStudent;
 use DagaSmart\School\Models\Student;
 use DagaSmart\BizAdmin\Services\AdminService;
-use Illuminate\Database\Query\Builder;
-
+use Illuminate\Database\Eloquent\Builder;
 /**
  * 基础-学生表
  *
@@ -20,6 +19,37 @@ class StudentService extends AdminService
 {
 	protected string $modelName = Student::class;
 
+    public function loadRelations($query): void
+    {
+        $query->with(['rel']);
+    }
+    public function searchable($query): void
+    {
+        parent::searchable($query);
+        $query->whereHas('rel', function (Builder $builder) {
+            $school_id = request('school_id');
+            $builder->when($school_id, function (Builder $builder) use (&$school_id) {
+                if (!is_array($school_id)) {
+                    $school_id = explode(',', $school_id);
+                }
+                $builder->whereIn('school_id', $school_id);
+            });
+            $grade_id = request('grade_id');
+            $builder->when($grade_id, function (Builder $builder) use (&$grade_id) {
+                if (!is_array($grade_id)) {
+                    $grade_id = explode(',', $grade_id);
+                }
+                $builder->whereIn('grade_id', $grade_id);
+            });
+            $classes_id = request('classes_id');
+            $builder->when($classes_id, function (Builder $builder) use (&$classes_id) {
+                if (!is_array($classes_id)) {
+                    $classes_id = explode(',', $classes_id);
+                }
+                $builder->whereIn('job_id', $classes_id);
+            });
+        });
+    }
 
     public function sortable($query): void
     {

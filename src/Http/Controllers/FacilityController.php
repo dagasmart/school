@@ -2,11 +2,11 @@
 
 namespace DagaSmart\School\Http\Controllers;
 
-use DagaSmart\School\Enums\Enum;
 use DagaSmart\School\Services\FacilityService;
 use DagaSmart\BizAdmin\Controllers\AdminController;
 use DagaSmart\BizAdmin\Renderers\Form;
 use DagaSmart\BizAdmin\Renderers\Page;
+
 
 /**
  * 基础-班级表
@@ -36,17 +36,16 @@ class FacilityController extends AdminController
                     ->searchable([
                         'name' => 'school_id',
                         'type' => 'select',
-                        'multiple' => true,
+                        'multiple' => false,
                         'searchable' => true,
                         'options' => $this->service->getSchoolAll(),
                     ])
                     ->width(200),
-                amis()->TableColumn('facility_name', '设施名称')->width(100),
-                amis()->TableColumn('classes_name','班级')->sortable(),
+                amis()->TableColumn('facility_name', '设施名称')->width(200),
+                amis()->TableColumn('facility_desc','设施描述'),
                 amis()->TableColumn('status', '状态')
-                    ->set('type','status')
-                    ->searchable(),
-                amis()->TableColumn('updated_at', '更新时间')->type('datetime')->width(150),
+                    ->set('type','status'),
+                amis()->TableColumn('updated_at', '更新时间')->type('datetime')->sortable()->width(150),
                 $this->rowActions('dialog',250)
                     ->set('align','center')
                     ->set('fixed','right')
@@ -59,27 +58,15 @@ class FacilityController extends AdminController
 	public function form($isEdit = false): Form
     {
 		return $this->baseForm()->body([
-            amis()->StaticExactControl('id','ID')->visibleOn('${id}'),
             amis()->SelectControl('school_id', '学校')
                 ->options($this->service->getSchoolAll())
-                ->value('${rel.school_id}')
+                ->value('${rel.school.id}')
                 ->searchable()
                 ->clearable()
                 ->required(),
-            amis()->SelectControl('grade_id', '年级')
-                ->source(admin_url('biz/school/${school_id||0}/grade'))
-                ->value('${rel.grade_id}')
-                ->selectMode('group')
-                ->disabledOn('${!school_id}')
-                ->searchable()
+            amis()->TextControl('facility_name', '设施名称')
                 ->clearable()
                 ->required(),
-            amis()->TextControl('classes_name','班级')
-                ->disabledOn('${!grade_id}')
-                ->maxLength(50)
-                ->clearable()
-                ->required(),
-            amis()->NumberControl('sort','排序')->size('xs'),
             amis()->SwitchControl('status','状态')
                 ->onText('开启')
                 ->offText('禁用')
@@ -91,40 +78,16 @@ class FacilityController extends AdminController
     {
 		return $this->baseDetail()->body([
             amis()->StaticExactControl('id','ID')->visibleOn('${id}'),
-            amis()->SelectControl('school_id', '学校')
+            amis()->SelectControl('rel.school_id', '学校')
                 ->options($this->service->getSchoolAll())
                 ->searchable()
                 ->clearable()
                 ->required(),
-            amis()->SelectControl('grade_id', '年级')
-                ->source(admin_url('biz/school/${school_id||0}/grade'))
-                ->selectMode('group')
-                ->searchable()
+            amis()->SelectControl('grade_id', '设施名称')
                 ->clearable()
                 ->required(),
-            amis()->TextControl('classes_name','班级')
-                ->maxLength(50)
-                ->clearable()
-                ->required(),
-            amis()->NumberControl('sort','排序')->size('xs'),
-            amis()->SwitchControl('status','状态')
-                ->onText('开启')
-                ->offText('禁用')
-                ->value(true),
 		])->static();
 	}
-
-    /**
-     * 学校年级班级列表
-     * @param $school_id
-     * @param $grade_id
-     * @return array
-     */
-    public function SchoolGradeClasses($school_id, $grade_id): array
-    {
-        return $this->service->SchoolGradeClasses($school_id, $grade_id);
-
-    }
 
 
 }

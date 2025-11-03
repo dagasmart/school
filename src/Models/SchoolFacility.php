@@ -15,5 +15,14 @@ class SchoolFacility extends Model
 
     public $timestamps = false;
 
+    /**
+     * 学校
+     * @return HasOne
+     */
+    public function school(): hasOne
+    {
+        return $this->hasOne(School::class, 'id', 'school_id')->select(['id', 'school_name']);
+    }
+
 
 }

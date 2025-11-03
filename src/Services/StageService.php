@@ -3,7 +3,7 @@
 namespace DagaSmart\School\Services;
 
 use DagaSmart\BizAdmin\Services\AdminService;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use DagaSmart\School\Models\Stage;
 
 

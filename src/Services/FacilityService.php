@@ -4,8 +4,6 @@ namespace DagaSmart\School\Services;
 
 use DagaSmart\School\Models\Facility;
 use DagaSmart\BizAdmin\Services\AdminService;
-use DagaSmart\School\Models\Grade;
-use DagaSmart\School\Models\School;
 use DagaSmart\School\Models\SchoolGradeClasses;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -20,6 +18,10 @@ class FacilityService extends AdminService
 {
 	protected string $modelName = Facility::class;
 
+    public function loadRelations($query): void
+    {
+        $query->with(['school','rel']);
+    }
 
     public function sortable($query): void
     {
@@ -59,27 +61,6 @@ class FacilityService extends AdminService
     public function getSchoolAll(): array
     {
         return (new StudentService)->getSchoolAll();
-    }
-
-    /**
-     * 学校年级列表
-     * @param int $school_id
-     * @param $grade_id
-     * @return array
-     */
-    public function SchoolGradeClasses(int $school_id, $grade_id): array
-    {
-        $classes_id = SchoolGradeClasses::query()
-            ->where('school_id', $school_id)
-            ->where('grade_id', $grade_id)
-            ->pluck('classes_id')
-            ->unique()
-            ->filter()
-            ->toArray();
-        return Facility::query()
-            ->whereIn('id', $classes_id)
-            ->get(['id as value','classes_name as label'])
-            ->toArray();
     }
 
 }

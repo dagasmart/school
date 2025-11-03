@@ -8,7 +8,6 @@ use DagaSmart\School\Models\School;
 use DagaSmart\School\Models\Teacher;
 use DagaSmart\BizAdmin\Services\AdminService;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Arr;
 
 
 /**

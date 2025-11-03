@@ -6,7 +6,7 @@ use DagaSmart\School\Models\Grade;
 use DagaSmart\School\Models\School;
 use DagaSmart\BizAdmin\Services\AdminService;
 use DagaSmart\School\Models\Stage;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * 基础-学校表
