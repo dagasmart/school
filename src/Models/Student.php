@@ -18,6 +18,11 @@ class Student extends Model
 
     public $timestamps = true;
 
+    protected $casts = [
+        'region_info' => 'array',
+        'family' => 'array',
+    ];
+
     protected $appends = ['student_code'];
 
     public function getIdCardAttribute($value): string

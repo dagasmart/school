@@ -22,4 +22,12 @@ class Classes extends Model
         return $this->hasOne(SchoolGradeClasses::class)->with(['grade','school']);
     }
 
+    public function school(): HasOne
+    {
+        return $this->hasOne(SchoolGradeClasses::class,
+            'classes_id',
+            'id'
+        );
+    }
+
 }

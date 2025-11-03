@@ -33,7 +33,12 @@ class StudentService extends AdminService
     public function saving(&$data, $primaryKey = ''): void
     {
         //地区代码
-        $data['region_id'] = is_array($data['region_id']) ? $data['region_id']['code'] : $data['region_id'];
+        $region_id = $data['region_id'] ?? null;
+        if ($region_id) {
+            if (is_array($data['region_id'])) {
+                $data['region_id'] = $data['region_id']['code'];
+            }
+        }
         //手机号码
         $mobile = $data['mobile'] ?? null;
         if ($mobile && strpos($mobile, '*')) {
@@ -43,6 +48,14 @@ class StudentService extends AdminService
         $id_card = $data['id_card'] ?? null;
         if ($id_card && strpos($id_card, '*')) {
             unset($data['id_card']);
+        }
+        //模块
+        if (admin_current_module()) {
+            $data['module'] = admin_current_module();
+        }
+        //商户
+        if (admin_mer_id()) {
+            $data['mer_id'] = admin_mer_id();
         }
     }
 
@@ -70,10 +83,10 @@ class StudentService extends AdminService
         });
     }
 
-    public function deleted($ids): void
-    {
-        $this->getModel()->rel_school_grade_classes_student()->whereIn($this->primaryKey(), $ids)->delete();
-    }
+//    public function deleted($ids): void
+//    {
+//        $this->getModel()->rel_school_grade_classes_student()->whereIn($this->primaryKey(), $ids)->delete();
+//    }
 
     /**
      * 学校列表

@@ -48,25 +48,31 @@ class TeacherController extends AdminController
             ->autoFillHeight(true)
             ->columns([
                 amis()->TableColumn('id', 'ID')->sortable()->set('fixed','left'),
-                amis()->TableColumn('teacher_name', '老师姓名')->sortable()->searchable()->set('fixed','left'),
-                amis()->TableColumn('school.school_id', '所属学校')
-                    ->searchable(['type'=>'tree-select', 'searchable'=>true, 'options'=>$this->service->getSchoolAll()])
+                amis()->TableColumn('teacher_name', '姓名')->sortable()->searchable()->set('fixed','left'),
+                amis()->TableColumn('school_id', '所属学校')
+                    ->searchable([
+                        ['type'=>'tree-select', 'searchable'=>true, 'options'=>$this->service->getSchoolAll()],
+                        ['type'=>'tree-select', 'searchable'=>true, 'options'=>$this->service->getSchoolAll()]
+                    ])
                     //->breakpoint('*')
                     ->set('type','input-tag')
                     ->set('options',$this->service->getSchoolAll())
+                    ->set('value','${school.school_id}')
                     ->set('fixed','left')
                     ->set('static', true),
-                amis()->TableColumn('school.department_id', '部门')
+                amis()->TableColumn('department_id', '部门')
                     ->searchable(['type'=>'tree-select', 'multiple'=>true, 'searchable'=>true, 'options'=>$this->service->getDepartmentAll()])
                     ->set('type', 'input-tag')
                     ->set('options', $this->service->getDepartmentAll())
+                    ->set('value','${school.department_id}')
                     ->set('multiple', true)
                     ->set('width', 150)
                     ->set('static', true),
-                amis()->TableColumn('school.job_id', '教师职务')
+                amis()->TableColumn('job_id', '教师职务')
                     ->searchable(['type'=>'tree-select', 'multiple'=>true, 'searchable'=>true, 'options'=>$this->service->getJobAll()])
                     ->set('type', 'input-tag')
                     ->set('options', $this->service->getJobAll())
+                    ->set('value','${school.job_id}')
                     ->set('multiple', true)
                     ->set('width', 150)
                     ->set('static', true),

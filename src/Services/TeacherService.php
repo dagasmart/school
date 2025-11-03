@@ -23,7 +23,6 @@ class TeacherService extends AdminService
 
     public function loadRelations($query): void
     {
-        //Job::initialize();
         $query->with(['school','rel','combo']);
     }
 
@@ -31,16 +30,28 @@ class TeacherService extends AdminService
     {
         parent::searchable($query);
         $query->whereHas('school', function (Builder $builder) {
-            $school = request('school');
-            $builder->when($school, function (Builder $builder) use (&$school) {
-                $builder->whereIn('school_id', explode(',', $school));
+            $school_id = request('school_id');
+            $builder->when($school_id, function (Builder $builder) use (&$school_id) {
+                if (!is_array($school_id)) {
+                    $school_id = explode(',', $school_id);
+                }
+                $builder->whereIn('school_id', $school_id);
+            });
+            $department_id = request('department_id');
+            $builder->when($department_id, function (Builder $builder) use (&$department_id) {
+                if (!is_array($department_id)) {
+                    $department_id = explode(',', $department_id);
+                }
+                $builder->whereIn('department_id', $department_id);
             });
             $job_id = request('job_id');
             $builder->when($job_id, function (Builder $builder) use (&$job_id) {
-                $builder->whereIn('job_id', explode(',', $job_id));
+                if (!is_array($job_id)) {
+                    $job_id = explode(',', $job_id);
+                }
+                $builder->whereIn('job_id', $job_id);
             });
         });
-
     }
 
     public function sortable($query): void
@@ -54,8 +65,16 @@ class TeacherService extends AdminService
 
     public function saving(&$data, $primaryKey = ''): void
     {
+        if (is_repeat($data['combo'])) {
+            admin_abort('学校信息12：部门或职务选项有重叠，请修改或删除');
+        }
         //地区代码
-        $data['region_id'] = is_array($data['region_id']) ? $data['region_id']['code'] : $data['region_id'];
+        $region_id = $data['region_id'] ?? null;
+        if ($region_id) {
+            if (is_array($data['region_id'])) {
+                $data['region_id'] = $data['region_id']['code'];
+            }
+        }
         //手机号码
         $mobile = $data['mobile'] ?? null;
         if ($mobile && strpos($mobile, '*')) {
@@ -65,6 +84,14 @@ class TeacherService extends AdminService
         $id_card = $data['id_card'] ?? null;
         if ($id_card && strpos($id_card, '*')) {
             unset($data['id_card']);
+        }
+        //模块
+        if (admin_current_module()) {
+            $data['module'] = admin_current_module();
+        }
+        //商户
+        if (admin_mer_id()) {
+            $data['mer_id'] = admin_mer_id();
         }
     }
 
@@ -76,6 +103,9 @@ class TeacherService extends AdminService
         return admin_transaction(function () use ($primaryKey, $data) {
             $schoolJobs = [];
             if ($data['combo']) {
+                if (is_repeat($data['combo'])) {
+                    admin_abort('学校信息：部门或职务选项有重叠，请修改或删除');
+                }
                 array_walk($data['combo'], function ($item) use (&$schoolJobs) {
                     $school_id = $item['school_id'];
                     $department_id = $item['department_id'];
