@@ -41,10 +41,10 @@ class SchoolServiceProvider extends ServiceProvider
         ],
         [
             'parent' => '基础维护',
-            'title' => '设施管理',
+            'title' => '基础设施',
             'url' => '/biz/school/facility',
             'url_type' => 1,
-            'icon' => 'simple-icons:googleclassroom',
+            'icon' => 'heroicons:building-office-2',
         ],
 
     ];

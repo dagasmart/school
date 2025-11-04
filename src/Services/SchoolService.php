@@ -35,6 +35,7 @@ class SchoolService extends AdminService
 
     public function saving(&$data, $primaryKey = ''): void
     {
+        $data = clear_array_trim($data);
         if (!empty($data['school_grade'])) {
             //学段年级
             $school_grade = explode(',', $data['school_grade']);
@@ -47,6 +48,31 @@ class SchoolService extends AdminService
                 ->unique()
                 ->toArray();
             $data['school_grade'] = admin_sort(array_unique(array_merge($parent, $school_grade)), 'desc');
+        }
+        $id = $data['id'] ?? null;
+        $school_name = $data['school_name'] ?? null;
+        if ($school_name) {
+            $exists = $this->getModel()->query()
+                ->where('school_name', $school_name)
+                ->when($id, function ($builder) use ($id) {
+                    return $builder->where('id', '!=', $id);
+                })
+                ->exists();
+            if ($exists) {
+                admin_abort('当前学校名称已存在，请检查重试');
+            }
+        }
+        $credit_code = $data['credit_code'] ?? null;
+        if ($credit_code) {
+            $exists = $this->getModel()->query()
+                ->where('credit_code', $credit_code)
+                ->when($id, function ($builder) use ($id) {
+                    return $builder->where('id', '!=', $id);
+                })
+                ->exists();
+            if ($exists) {
+                admin_abort('当前学校信用代码已被占用，请检查重试');
+            }
         }
         //地区代码
         $data['region'] = is_array($data['region']) ? $data['region']['code'] : $data['region'];

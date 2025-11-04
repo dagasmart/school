@@ -192,6 +192,17 @@ class SchoolController extends AdminController
                         ->required()
                 ])
             ]),
+            // 商户信息
+            amis()->Tab()->title('商户信息')->body([
+                amis()->SelectControl('module', '模块')
+                    ->options(admin_module_all())
+                    ->clearable()
+                    ->size('md'),
+                amis()->SelectControl('mer_id', '商户')
+                    ->options($this->service->getMerchantAll())
+                    ->clearable()
+                    ->size('md'),
+            ])->visible(!admin_mer_id()),
 
         ]);
 	}
