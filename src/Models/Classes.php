@@ -3,7 +3,6 @@
 namespace DagaSmart\School\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Support\Collection;
 
 /**
  * 基础-学生表

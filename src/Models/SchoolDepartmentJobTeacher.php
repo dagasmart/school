@@ -2,6 +2,7 @@
 
 namespace DagaSmart\School\Models;
 
+use DagaSmart\BizAdmin\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
@@ -13,6 +14,16 @@ class SchoolDepartmentJobTeacher extends Model
 
     public $timestamps = false;
 
+    /**
+     * 关联学校
+     * @return void
+     */
+    protected static function booted(): void
+    {
+        static::addGlobalScope(ActiveScope::class, function ($query) {
+            $query->whereHas('base');
+        });
+    }
 
     /**
      * 学校

@@ -2,8 +2,7 @@
 
 namespace DagaSmart\School\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\hasMany;
+use DagaSmart\BizAdmin\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
@@ -14,6 +13,13 @@ class SchoolFacility extends Model
 	protected $table = 'biz_school_facility';
 
     public $timestamps = false;
+
+//    protected static function booted(): void
+//    {
+//        static::addGlobalScope(ActiveScope::class, function ($query) {
+//            $query->whereHas('base');
+//        });
+//    }
 
     /**
      * 学校

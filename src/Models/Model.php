@@ -4,6 +4,7 @@ namespace DagaSmart\School\Models;
 
 use DagaSmart\BizAdmin\Models\BaseModel;
 use DagaSmart\BizAdmin\Scopes\ActiveScope;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  *基座模型
@@ -25,6 +26,12 @@ class Model extends BaseModel
     {
         static::addGlobalScope(new ActiveScope('school'));
         parent::booted();
+    }
+
+    //关联学校
+    public function base(): hasMany
+    {
+        return $this->hasMany(School::class, 'id', 'school_id');
     }
 
 }

@@ -2,12 +2,13 @@
 
 namespace DagaSmart\School\Models;
 
+use DagaSmart\BizAdmin\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\hasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
- * 基础-老师-职务表
+ * 基础-学校-年级-班级-学生-关联类
  */
 class SchoolGradeClassesStudent extends Model
 {
@@ -17,6 +18,17 @@ class SchoolGradeClassesStudent extends Model
     protected $fillable = ['school_id','grade_id','classes_id','student_id'];
 
     public $timestamps = false;
+
+    /**
+     * 关联学校
+     * @return void
+     */
+    protected static function booted(): void
+    {
+        static::addGlobalScope(ActiveScope::class, function ($query) {
+            $query->whereHas('base');
+        });
+    }
 
     /**
      * 班级

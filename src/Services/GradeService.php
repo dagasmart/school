@@ -4,7 +4,6 @@ namespace DagaSmart\School\Services;
 
 use DagaSmart\School\Models\Grade;
 use DagaSmart\School\Models\School;
-use DagaSmart\BizAdmin\Services\AdminService;
 use Illuminate\Database\Eloquent\Builder;
 
 /**

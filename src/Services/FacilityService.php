@@ -3,8 +3,7 @@
 namespace DagaSmart\School\Services;
 
 use DagaSmart\School\Models\Facility;
-use DagaSmart\BizAdmin\Services\AdminService;
-use DagaSmart\School\Models\SchoolGradeClasses;
+use DagaSmart\School\Models\SchoolFacility;
 use Illuminate\Database\Eloquent\Builder;
 
 
@@ -44,14 +43,13 @@ class FacilityService extends AdminService
         $request = request()->all();
         $data = [
             'school_id' => $request['school_id'],
-            'grade_id' => $request['grade_id'],
-            'classes_id' => $model->id
+            'facility_id' => $model->id,
         ];
         admin_transaction(function () use ($data) {
-            if ($data['classes_id']) {
-            SchoolGradeClasses::query()->where('classes_id', $data['classes_id'])->delete();
+            if ($data['facility_id']) {
+                SchoolFacility::query()->where('facility_id', $data['facility_id'])->delete();
             }
-            SchoolGradeClasses::query()->insert($data);
+            SchoolFacility::query()->insert($data);
         });
     }
 

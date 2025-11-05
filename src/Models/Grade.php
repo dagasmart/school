@@ -2,11 +2,9 @@
 
 namespace DagaSmart\School\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Support\Collection;
 
 /**
- * 基础-学生表
+ * 基础-年级表
  */
 class Grade extends Model
 {
