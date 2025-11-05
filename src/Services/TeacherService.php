@@ -108,14 +108,18 @@ class TeacherService extends AdminService
                     $school_id = $item['school_id'];
                     $department_id = $item['department_id'];
                     $teacher_id = $item['teacher_id'];
+                    $module = $item['module'];
+                    $mer_id = $item['mer_id'];
                     $jobs = explode(',', $item['job_id']);
-                    array_walk($jobs, function ($value) use (&$schoolJobs, $school_id, $department_id, $teacher_id) {
-                        $schoolJobs[] = [
-                            'school_id' => $school_id,
-                            'department_id' => $department_id,
-                            'teacher_id' => $teacher_id,
-                            'job_id' => $value
-                        ];
+                    array_walk($jobs, function ($value) use (&$schoolJobs, $school_id, $department_id, $teacher_id,$module,$mer_id) {
+                        $row = [];
+                        $row['school_id'] = $school_id;
+                        $row['department_id'] = $department_id;
+                        $row['teacher_id'] = $teacher_id;
+                        $row['job_id'] = $value;
+                        $row['module'] = $module ?? admin_current_module();
+                        $row['mer_id'] = $mer_id ?? admin_mer_id();
+                        $schoolJobs[] = $row;
                     });
                 });
             }

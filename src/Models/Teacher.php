@@ -111,7 +111,9 @@ class Teacher extends Model
         return $this->hasMany(SchoolDepartmentJobTeacher::class,
             'teacher_id',
             'id'
-        )->select(admin_raw("school_id,department_id,teacher_id,job_id"));
+            )
+            ->withoutGlobalScope('ActiveScope')
+            ->select(admin_raw("school_id,department_id,job_id,teacher_id,module,mer_id"));
     }
 
     public function job(): HasOne

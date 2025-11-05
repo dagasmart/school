@@ -186,7 +186,6 @@ class TeacherController extends AdminController
                         ->options($this->service->getSchoolAll())
                         ->searchable()
                         ->required(),
-                    amis()->HiddenControl('teacher_id')->value('${id}'),
                     amis()->TreeSelectControl('department_id', '部门')
                         ->options($this->service->getDepartmentAll())
                         ->onlyChildren()
@@ -204,6 +203,9 @@ class TeacherController extends AdminController
                         ->hideNodePathLabel()
                         ->searchable()
                         ->required(),
+                    amis()->TextControl('teacher_id')->value('${id}'),
+                    amis()->TextControl('module'),
+                    amis()->TextControl('mer_id'),
                 ])
                 ->className('border-gray-100 border-dashed')
                 ->mode('horizontal')
