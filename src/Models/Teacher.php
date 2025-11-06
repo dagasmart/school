@@ -134,8 +134,13 @@ class Teacher extends Model
 
     public function jobs(): BelongsToMany
     {
-        return $this->belongsToMany(Job::class, SchoolDepartmentJobTeacher::class, 'teacher_id', 'job_id')
-            ->wherePivot('mer_id', admin_mer_id());
+        return $this->belongsToMany(
+            Job::class,
+            SchoolDepartmentJobTeacher::class,
+            'teacher_id',
+            'job_id'
+            );
+            //->wherePivot('mer_id', admin_mer_id());
     }
 
 
