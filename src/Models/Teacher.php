@@ -113,7 +113,7 @@ class Teacher extends Model
             'id'
             )
             ->withoutGlobalScope('ActiveScope')
-            ->select(admin_raw("school_id,department_id,job_id,teacher_id,module,mer_id"));
+            ->select(admin_raw("school_id,department_id,job_id,teacher_id,teacher_sn,module,mer_id"));
     }
 
     public function job(): HasOne
@@ -134,7 +134,8 @@ class Teacher extends Model
 
     public function jobs(): BelongsToMany
     {
-        return $this->belongsToMany(Job::class, SchoolDepartmentJobTeacher::class, 'teacher_id', 'job_id');
+        return $this->belongsToMany(Job::class, SchoolDepartmentJobTeacher::class, 'teacher_id', 'job_id')
+            ->wherePivot('mer_id', admin_mer_id());
     }
 
 

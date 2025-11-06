@@ -203,7 +203,8 @@ class TeacherController extends AdminController
                         ->hideNodePathLabel()
                         ->searchable()
                         ->required(),
-                    amis()->TextControl('teacher_id')->value('${id}'),
+                    amis()->HiddenControl('teacher_id')->value('${id}'),
+                    amis()->TextControl('teacher_sn'),
                     amis()->TextControl('module'),
                     amis()->TextControl('mer_id'),
                 ])
