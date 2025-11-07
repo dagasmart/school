@@ -94,82 +94,33 @@ class TeacherService extends AdminService
         }
     }
 
-    /**
-     * 更新数据
-     */
-//    public function update($primaryKey, $data): bool
-//    {
-//        return admin_transaction(function () use ($primaryKey, $data) {
-//            $schoolJobs = [];
-//            if ($data['combo']) {
-//                if (is_repeat($data['combo'])) {
-//                    admin_abort('学校信息：部门或职务选项有重叠，请修改或删除');
-//                }
-//                array_walk($data['combo'], function ($item) use (&$schoolJobs) {
-//                    $school_id = $item['school_id'];
-//                    $department_id = $item['department_id'];
-//                    $teacher_id = $item['teacher_id'];
-//                    $teacher_sn = $item['teacher_sn'] ?? null;
-//                    $module = $item['module'] ?? null;
-//                    $mer_id = $item['mer_id'] ?? null;
-//                    $jobs = explode(',', $item['job_id']);
-//                    array_walk($jobs, function ($value) use (&$schoolJobs, $school_id, $department_id, $teacher_id, $teacher_sn, $module, $mer_id) {
-//                        $row = [];
-//                        $row['school_id'] = $school_id;
-//                        $row['department_id'] = $department_id;
-//                        $row['job_id'] = $value;
-//                        $row['teacher_id'] = $teacher_id;
-//                        $schoolJobs[] = $row;
-//                    });
-//                });
-//            }
-//            unset($data['school']);
-//            $model = $this->getModel()->query()->where(['id' => $data['id']])->first();
-//            //$model->jobs()->forceDelete();
-//            $model->jobs()->sync($schoolJobs);
-//            return parent::update($primaryKey, $data);
-//        });
-//    }
 
-    public function saved($model, $isEdit = false)
+    public function saved($model, $isEdit = false): void
     {
-        //dump($model->jobs()->get()->toArray());die;
         $combo = $this->request->combo ?? null;
-        $current = [];
         if ($model && $combo) {
+            $current = [];
             array_walk($combo, function ($item) use ($model, &$current) {
                 $jobs = explode(',', $item['job_id']);
                 array_walk($jobs, function ($value) use ($model, $item, &$current) {
                     $school_id = $item['school_id'];
                     $department_id = $item['department_id'];
                     $teacher_id = $model->id;
+                    $module = $item['module'] ?? admin_current_module();
+                    $mer_id = $item['mer_id'] ?? admin_mer_id();
                     $row = [];
                     $row['school_id'] = $school_id;
                     $row['department_id'] = $department_id;
                     $row['job_id'] = $value;
                     $row['teacher_id'] = $teacher_id;
-//                    $row['teacher_sn'] = $school_id . $teacher_id;
-//                    $row['module'] = admin_current_module();
-//                    $row['mer_id'] = 1;
+                    $row['teacher_sn'] = $school_id . $teacher_id;
+                    $row['module'] = $module;
+                    $row['mer_id'] = $mer_id;
                     $current[] = $row;
-                    //SchoolDepartmentJobTeacher::query()->where($row)->forceDelete();
+                    SchoolDepartmentJobTeacher::query()->where($row)->forceDelete();
                 });
             });
-        }
-        $exist = $model->jobs()->get(['school_id','department_id','job_id','teacher_id'])->toArray();
-        if ($exist) {
-            array_walk($exist, function (&$item) {
-                unset($item['pivot']);
-            });
-        }
-        if (count($current) >= count($exist)) {
-            $extra = array_diff_multi($current, $exist);
-        } else {
-            $extra = array_diff_multi($exist, $current);
-        }
-        //dump($extra);die;
-        if ($extra) {
-            $model->jobs()->syncWithoutDetaching($extra);
+            $model->schoolJobs()->sync($current);
         }
     }
 

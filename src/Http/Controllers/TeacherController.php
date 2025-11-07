@@ -204,6 +204,8 @@ class TeacherController extends AdminController
                         ->searchable()
                         ->required(),
                     amis()->HiddenControl('teacher_id')->value('${id}'),
+                    amis()->HiddenControl('module')->value(admin_current_module()),
+                    amis()->HiddenControl('mer_id')->value(admin_mer_id()),
                 ])
                 ->className('border-gray-100 border-dashed')
                 ->mode('horizontal')

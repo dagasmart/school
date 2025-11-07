@@ -132,7 +132,7 @@ class Teacher extends Model
         return School::query()->whereNull('deleted_at')->pluck('school_name','id');
     }
 
-    public function jobs(): BelongsToMany
+    public function schoolJobs(): BelongsToMany
     {
         return $this->belongsToMany(
             Job::class,
