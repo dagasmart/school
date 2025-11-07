@@ -139,8 +139,8 @@ class Teacher extends Model
             SchoolDepartmentJobTeacher::class,
             'teacher_id',
             'job_id'
-            );
-            //->wherePivot('mer_id', admin_mer_id());
+            )
+            ->wherePivot('mer_id', admin_mer_id());
     }
 
 

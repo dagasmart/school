@@ -5,6 +5,7 @@ namespace DagaSmart\School\Services;
 use DagaSmart\School\Models\Department;
 use DagaSmart\School\Models\Job;
 use DagaSmart\School\Models\School;
+use DagaSmart\School\Models\SchoolDepartmentJobTeacher;
 use DagaSmart\School\Models\Teacher;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -132,29 +133,44 @@ class TeacherService extends AdminService
 
     public function saved($model, $isEdit = false)
     {
-        dump($model->jobs()->get()->toArray());die;
+        //dump($model->jobs()->get()->toArray());die;
         $combo = $this->request->combo ?? null;
         $current = [];
-        if ($combo) {
-            array_walk($combo, function ($item) use (&$current) {
-                $school_id = $item['school_id'];
-                $department_id = $item['department_id'];
-                $teacher_id = $item['teacher_id'];
+        if ($model && $combo) {
+            array_walk($combo, function ($item) use ($model, &$current) {
                 $jobs = explode(',', $item['job_id']);
-                array_walk($jobs, function ($value) use (&$current, $school_id, $department_id, $teacher_id) {
+                array_walk($jobs, function ($value) use ($model, $item, &$current) {
+                    $school_id = $item['school_id'];
+                    $department_id = $item['department_id'];
+                    $teacher_id = $model->id;
                     $row = [];
                     $row['school_id'] = $school_id;
                     $row['department_id'] = $department_id;
                     $row['job_id'] = $value;
                     $row['teacher_id'] = $teacher_id;
-                    $row['teacher_sn'] = $school_id . $teacher_id;
-                    $row['module'] = admin_current_module();
-                    $row['mer_id'] = 1;
+//                    $row['teacher_sn'] = $school_id . $teacher_id;
+//                    $row['module'] = admin_current_module();
+//                    $row['mer_id'] = 1;
                     $current[] = $row;
+                    //SchoolDepartmentJobTeacher::query()->where($row)->forceDelete();
                 });
             });
         }
-        $model->jobs()->sync($current);
+        $exist = $model->jobs()->get(['school_id','department_id','job_id','teacher_id'])->toArray();
+        if ($exist) {
+            array_walk($exist, function (&$item) {
+                unset($item['pivot']);
+            });
+        }
+        if (count($current) >= count($exist)) {
+            $extra = array_diff_multi($current, $exist);
+        } else {
+            $extra = array_diff_multi($exist, $current);
+        }
+        //dump($extra);die;
+        if ($extra) {
+            $model->jobs()->syncWithoutDetaching($extra);
+        }
     }
 
     /**

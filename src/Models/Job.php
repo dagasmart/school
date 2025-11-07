@@ -21,6 +21,7 @@ class Job extends Model
      */
     public static function initialize(): void
     {
+        $id = Job::query()->forceDelete();
         $jobs = Enum::job();
         foreach ($jobs as $k => $job) {
             $data = [
