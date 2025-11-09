@@ -21,7 +21,9 @@ class SchoolDepartmentJobTeacher extends Model
     protected static function booted(): void
     {
         static::addGlobalScope(ActiveScope::class, function ($query) {
-            $query->whereHas('base');
+            $query->whereHas('base')
+                ->where('module', admin_current_module())
+                ->where('mer_id', admin_mer_id());
         });
     }
 

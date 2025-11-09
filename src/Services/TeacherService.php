@@ -62,6 +62,16 @@ class TeacherService extends AdminService
         }
     }
 
+    public function store($data): bool
+    {
+        $id = $data['id'] ?? null;
+        if ($id) {
+            return $this->update($id, $data);
+        } else {
+            return parent::store($data);
+        }
+    }
+
     public function saving(&$data, $primaryKey = ''): void
     {
         if (is_repeat($data['combo'])) {
@@ -93,7 +103,6 @@ class TeacherService extends AdminService
             $data['mer_id'] = admin_mer_id();
         }
     }
-
 
     public function saved($model, $isEdit = false): void
     {
@@ -130,6 +139,13 @@ class TeacherService extends AdminService
     public function schoolData(): \Illuminate\Support\Collection
     {
         return $this->getModel()->schoolData();
+    }
+
+    public function SchoolTeacherCheck($id_card)
+    {
+        return $this->query()
+            ->where(['id_card' => $id_card])
+            ->first();
     }
 
     /**

@@ -143,10 +143,178 @@ class TeacherController extends AdminController
             amis()->Tab()->title('基本信息')->body([
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->GroupControl()->direction('vertical')->body([
-                        amis()->TextControl('teacher_name', '姓名')->required(),
-                        amis()->TextControl('teacher_sn', '教师编码'),
-                        amis()->TextControl('id_card', '身份证号')->required(),
-                        amis()->TextControl('work_sn', '教工号'),
+                        amis()->HiddenControl('id'),
+                        amis()->TextControl('id_card', '身份证号')
+                            ->required()
+                            ->onEvent([
+                                'blur' => [
+                                    'actions' => [
+                                        [
+                                            'actionType' => 'ajax',
+                                            'api' => [
+                                                'method' => 'GET',
+                                                'url' => admin_url('biz/school/teacher/${id_card||0}/check'),
+                                            ],
+                                        ],
+                                        [
+                                            'actionType'  => 'setValue',
+                                            'componentName' => 'id',
+                                            'args' => [
+                                                'value' => '${event.data.responseResult.responseData.id||null}'
+                                            ],
+                                        ],
+                                        [
+                                            'actionType' => 'disabled',
+                                            'componentName' => 'id',
+                                            'expression' => '${!!event.data.responseResult.responseData.id}'
+                                        ],
+                                        [
+                                            'actionType' => 'enabled',
+                                            'componentName' => 'id',
+                                            'expression' => '${!event.data.responseResult.responseData.id}'
+                                        ],
+                                        [
+                                            'actionType'  => 'setValue',
+                                            'componentName' => 'teacher_name',
+                                            'args' => [
+                                                'value' => '${event.data.responseResult.responseData.teacher_name||null}'
+                                            ],
+                                        ],
+                                        [
+                                            'actionType' => 'disabled',
+                                            'componentName' => 'teacher_name',
+                                            'expression' => '${!!event.data.responseResult.responseData.teacher_name}'
+                                        ],
+                                        [
+                                            'actionType' => 'enabled',
+                                            'componentName' => 'teacher_name',
+                                            'expression' => '${!event.data.responseResult.responseData.teacher_name}'
+                                        ],
+                                        [
+                                            'actionType'  => 'setValue',
+                                            'componentName' => 'teacher_no',
+                                            'args' => [
+                                                'value' => '${event.data.responseResult.responseData.teacher_no||null}'
+                                            ],
+                                        ],
+                                        [
+                                            'actionType' => 'disabled',
+                                            'componentName' => 'teacher_no',
+                                            'expression' => '${!!event.data.responseResult.responseData.teacher_no}'
+                                        ],
+                                        [
+                                            'actionType' => 'enabled',
+                                            'componentName' => 'teacher_no',
+                                            'expression' => '${!event.data.responseResult.responseData.teacher_no}'
+                                        ],
+                                        [
+                                            'actionType' => 'setValue',
+                                            'componentName' => 'avatar',
+                                            'args' => [
+                                                'value' => '${event.data.responseResult.responseData.avatar||null}',
+                                            ],
+                                        ],
+                                        [
+                                            'actionType' => 'disabled',
+                                            'componentName' => 'avatar',
+                                            'expression' => '${!!event.data.responseResult.responseData.avatar}'
+                                        ],
+                                        [
+                                            'actionType' => 'enabled',
+                                            'componentName' => 'avatar',
+                                            'expression' => '${!event.data.responseResult.responseData.avatar}'
+                                        ],
+                                        [
+                                            'actionType'  => 'setValue',
+                                            'componentName' => 'email',
+                                            'args' => [
+                                                'value' => '${event.data.responseResult.responseData.email||null}'
+                                            ],
+                                        ],
+                                        [
+                                            'actionType' => 'disabled',
+                                            'componentName' => 'email',
+                                            'expression' => '${!!event.data.responseResult.responseData.email}'
+                                        ],
+                                        [
+                                            'actionType' => 'enabled',
+                                            'componentName' => 'email',
+                                            'expression' => '${!event.data.responseResult.responseData.email}'
+                                        ],
+                                        [
+                                            'actionType'  => 'setValue',
+                                            'componentName' => 'mobile',
+                                            'args' => [
+                                                'value' => '${event.data.responseResult.responseData.mobile||null}'
+                                            ],
+                                        ],
+                                        [
+                                            'actionType' => 'disabled',
+                                            'componentName' => 'mobile',
+                                            'expression' => '${!!event.data.responseResult.responseData.mobile}'
+                                        ],
+                                        [
+                                            'actionType' => 'enabled',
+                                            'componentName' => 'mobile',
+                                            'expression' => '${!event.data.responseResult.responseData.mobile}'
+                                        ],
+                                        [
+                                            'actionType'  => 'setValue',
+                                            'componentName' => 'sex',
+                                            'args' => [
+                                                'value' => '${event.data.responseResult.responseData.sex||null}'
+                                            ],
+                                        ],
+                                        [
+                                            'actionType' => 'disabled',
+                                            'componentName' => 'sex',
+                                            'expression' => '${!!event.data.responseResult.responseData.sex}'
+                                        ],
+                                        [
+                                            'actionType' => 'enabled',
+                                            'componentName' => 'sex',
+                                            'expression' => '${!event.data.responseResult.responseData.sex}'
+                                        ],
+                                        [
+                                            'actionType'  => 'setValue',
+                                            'componentName' => 'nation',
+                                            'args' => [
+                                                'value' => '${event.data.responseResult.responseData.nation||null}'
+                                            ],
+                                        ],
+                                        [
+                                            'actionType' => 'disabled',
+                                            'componentName' => 'nation',
+                                            'expression' => '${!!event.data.responseResult.responseData.nation}'
+                                        ],
+                                        [
+                                            'actionType' => 'enabled',
+                                            'componentName' => 'nation',
+                                            'expression' => '${!event.data.responseResult.responseData.nation}'
+                                        ],
+                                        [
+                                            'actionType'  => 'setValue',
+                                            'componentName' => 'region_id',
+                                            'args' => [
+                                                'value' => '${event.data.responseResult.responseData.region_id||null}'
+                                            ],
+                                        ],
+                                        [
+                                            'actionType' => 'disabled',
+                                            'componentName' => 'region_id',
+                                            'expression' => '${!!event.data.responseResult.responseData.region_id}'
+                                        ],
+                                        [
+                                            'actionType' => 'enabled',
+                                            'componentName' => 'region_id',
+                                            'expression' => '${!event.data.responseResult.responseData.region_id}'
+                                        ]
+                                    ]
+                                ]
+                            ]),
+                        amis()->TextControl('teacher_name', '教师姓名')->id('teacher_name')->required(),
+                        amis()->TextControl('teacher_no', '教师编码')->labelRemark('全国统一教师资格代码'),
+                        amis()->TextControl('email', '常用邮箱'),
                         amis()->TextControl('mobile', '手机号')->required(),
                     ]),
                     amis()->GroupControl()->direction('vertical')->body([
@@ -171,7 +339,7 @@ class TeacherController extends AdminController
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->SelectControl('sex', '性别')
                         ->options(Enum::sex())->value(3),
-                    amis()->SelectControl('nation_id', '民族')
+                    amis()->SelectControl('nation', '民族')
                         ->options(Enum::nation()),
                     amis()->SelectControl('work_status', '状态')
                         ->options(Enum::WorkStatus)
@@ -236,7 +404,6 @@ class TeacherController extends AdminController
                     ]),
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->TextControl('address', '家庭住址'),
-                    amis()->TextControl('email', '常用邮箱'),
                 ]),
                 amis()->HiddenControl('region_info', '地区信息')->id('form_region_info'),
                 amis()->TextControl('address_info', '详细地址')
@@ -396,6 +563,13 @@ class TeacherController extends AdminController
             ]),
         ])->static();
 	}
+
+    public function SchoolTeacherCheck(): JsonResponse|JsonResource
+    {
+        $id_card = request()->id_card ?? null;
+        $res = $this->service->SchoolTeacherCheck($id_card);
+        return $this->response()->success($res);
+    }
 
     public function importAction($api = null): DialogAction
     {
