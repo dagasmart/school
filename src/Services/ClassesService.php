@@ -39,7 +39,7 @@ class ClassesService extends AdminService
                 if (!is_array($grade_id)) {
                     $grade_id = explode(',', $grade_id);
                 }
-                $builder->whereIn('grade_id', $department_id);
+                $builder->whereIn('grade_id', $grade_id);
             });
             $classes_id = request('classes_id');
             $builder->when($classes_id, function (Builder $builder) use (&$classes_id) {

@@ -61,4 +61,26 @@ class FacilityService extends AdminService
         return (new StudentService)->getSchoolAll();
     }
 
+    /**
+     * 递归选择项
+     * @return array
+     */
+    public function options(): array
+    {
+        $id = request()->id;
+        $school_id = request()->school_id;
+        $data = $this->query()->from('biz_facility as a')
+            ->join('biz_school_facility as b','a.id','=','b.facility_id')
+            ->select(['a.id as value', 'a.facility_name as label', 'a.id', 'a.parent_id'])
+            ->when($school_id, function($query) use ($school_id) {
+                $query->where('b.school_id', $school_id);
+            })
+            ->when($id, function($query) use ($id) {
+                $query->where('b.facility_id', '<>', $id);
+            })
+            ->get()
+            ->toArray();
+        return array2tree($data);
+    }
+
 }

@@ -16,6 +16,7 @@ Route::group([
     $router->get('school/{school_id}/grade', [Controllers\GradeController::class, 'SchoolGrade']);
     $router->get('school/{school_id}/grade/{grade_id}/classes', [Controllers\ClassesController::class, 'SchoolGradeClasses']);
     $router->get('school/teacher/{id_card}/check', [Controllers\TeacherController::class, 'SchoolTeacherCheck']);
+    $router->get('school/{school_id}/facility/{id}/options', [Controllers\FacilityController::class, 'options']);
 
 });
 
