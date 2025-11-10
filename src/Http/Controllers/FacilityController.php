@@ -48,8 +48,8 @@ class FacilityController extends AdminController
                     ->set('type', 'tree-select')
                     ->set('options', $this->service->options())
                     ->set('static', true)
-                    ->width(200),
-                amis()->TableColumn('facility_desc','设施描述'),
+                    ->width(150),
+                amis()->TableColumn('facility_code','设施编码')->width(150),
                 amis()->TableColumn('state', '状态')
                     ->set('type','status'),
                 amis()->TableColumn('sort','排序'),
@@ -84,6 +84,10 @@ class FacilityController extends AdminController
             amis()->TextControl('facility_name', '设施名称')
                 ->clearable()
                 ->required(),
+            amis()->TextControl('facility_code', '设施编码')
+                ->clearable(),
+            amis()->TextareaControl('facility_desc', '设施描述')
+                ->clearable(),
             amis()->NumberControl('sort', '排序')
                 ->min(0)
                 ->max(100)
@@ -99,6 +103,7 @@ class FacilityController extends AdminController
 	public function detail(): Form
     {
 		return $this->baseDetail()->body([
+            amis()->StaticExactControl('id','ID')->visibleOn('${id}'),
             amis()->SelectControl('school_id', '学校')
                 ->options($this->service->getSchoolAll())
                 ->value('${rel.school.id}')
@@ -108,11 +113,16 @@ class FacilityController extends AdminController
             amis()->TreeSelectControl('parent_id', '选择主体')
                 ->source(admin_url('biz/school/${school_id||0}/facility/${id||0}/options'))
                 ->options($this->service->options())
+                ->disabledOn('${!school_id}')
                 ->searchable()
                 ->clearable(),
             amis()->TextControl('facility_name', '设施名称')
                 ->clearable()
                 ->required(),
+            amis()->TextControl('facility_code', '设施编码')
+                ->clearable(),
+            amis()->TextareaControl('facility_desc', '设施描述')
+                ->clearable(),
             amis()->NumberControl('sort', '排序')
                 ->min(0)
                 ->max(100)
@@ -121,7 +131,9 @@ class FacilityController extends AdminController
             amis()->SwitchControl('state','状态')
                 ->onText('开启')
                 ->offText('禁用')
-                ->value(true),
+                ->value(true)
+                ->disabled()
+                ->static(false),
 		])->static();
 	}
 
