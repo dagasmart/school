@@ -4,6 +4,7 @@ namespace DagaSmart\School\Services;
 
 use DagaSmart\School\Models\Classes;
 use DagaSmart\School\Models\SchoolGradeClasses;
+use DagaSmart\School\Models\SchoolGradeClassesStudent;
 use Illuminate\Database\Eloquent\Builder;
 
 
@@ -76,10 +77,28 @@ class ClassesService extends AdminService
         ];
         admin_transaction(function () use ($data) {
             if ($data['classes_id']) {
-            SchoolGradeClasses::query()->where('classes_id', $data['classes_id'])->delete();
+                SchoolGradeClasses::query()->where($data)->delete();
             }
             SchoolGradeClasses::query()->insert($data);
         });
+    }
+
+    public function deleting($ids)
+    {
+        if (!is_array($ids)) {
+            $ids = explode(',', $ids);
+        }
+        admin_abort_if(!$ids, '请选择删除项');
+        //获取存在学生的班级id组
+        $oids = SchoolGradeClassesStudent::query()
+            ->whereIn('classes_id', $ids)
+            ->pluck('classes_id')
+            ->toArray();
+        //获取没有学生的班级id组
+        $ids = array_diff($ids, $oids);
+        admin_abort_if($oids && !$ids, '当前勾选班级存在学生信息，无法删除');
+        SchoolGradeClasses::query()->whereIn('classes_id', $ids)->delete();
+        return implode(',', $ids);
     }
 
     /**

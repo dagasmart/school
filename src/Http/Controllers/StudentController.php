@@ -3,6 +3,8 @@
 namespace DagaSmart\School\Http\Controllers;
 
 use DagaSmart\BizAdmin\Renderers\DialogAction;
+use DagaSmart\BizAdmin\Renderers\Page;
+use DagaSmart\BizAdmin\Support\Cores\AdminPipeline;
 use DagaSmart\School\Enums\Enum;
 use DagaSmart\School\Services\StudentService;
 use DagaSmart\BizAdmin\Controllers\AdminController;
@@ -20,7 +22,7 @@ class StudentController extends AdminController
 {
 	protected string $serviceName = StudentService::class;
 
-	public function list()
+	public function list(): Page
 	{
 		$crud = $this->baseCRUD()
 			->filterTogglable()
@@ -124,9 +126,8 @@ class StudentController extends AdminController
             amis()->Tab()->title('基本信息')->body([
                 amis()->GroupControl()->mode('horizontal')->body([
                     amis()->GroupControl()->direction('vertical')->body([
+                        amis()->TextControl('id_card', '身份证号')->required(),
                         amis()->TextControl('student_name', '姓名')->required(),
-                        amis()->TextControl('id_card', '身份证号')
-                            ->required(),
                         amis()->HiddenControl('student_code', '国网学籍号')->value('G${id_number}'),
                         amis()->SelectControl('school_id', '学校')
                             ->options($this->service->getSchoolAll())
@@ -442,6 +443,47 @@ class StudentController extends AdminController
             ->icon('fa-regular fa-pen-to-square')
             ->level('link');
 
+        $deleteButton = amis()->DialogAction()
+            ->label(__('admin.delete'))
+            ->className('text-danger')
+            ->icon('fa-solid fa-close')
+            ->level('link')
+            ->dialog(
+                amis()
+                    ->Dialog()
+                    ->title()
+                    ->className('py-2')
+                    ->actions([
+                        amis()->Action()->actionType('cancel')->label(admin_trans('admin.cancel')),
+                        amis()->Action()->actionType('submit')->label(admin_trans('admin.delete'))->level('danger'),
+                    ])
+                    ->body([
+                        amis()->Form()->wrapWithPanel(false)->api('delete:biz/school/classes/${id}')->body([
+                            amis()->Tpl()->className('py-2')->tpl(admin_trans('admin.confirm_delete')),
+                        ]),
+                    ])
+            );
+
+        $bulkDeleteButton = amis()->DialogAction()
+            ->label(__('admin.delete'))
+            ->className('text-danger border border-dashed border-danger')
+            ->icon('fa fa-trash-can')
+            ->dialog(
+                amis()
+                    ->Dialog()
+                    ->title(admin_trans('admin.delete'))
+                    ->className('py-2')
+                    ->actions([
+                        amis()->Action()->actionType('cancel')->label(admin_trans('admin.cancel')),
+                        amis()->Action()->actionType('submit')->label(admin_trans('admin.delete'))->level('danger'),
+                    ])
+                    ->body([
+                        amis()->Form()->wrapWithPanel(false)->api('delete:biz/school/classes/${ids}')->body([
+                            amis()->Tpl()->className('py-2')->tpl(admin_trans('admin.confirm_delete')),
+                        ]),
+                    ])
+            );
+
         return amis()->DialogAction()->label('班级管理')->icon('fa fa-slideshare')->dialog(
             amis()->Dialog()->title('班级管理')->size('md')->actions([])->body(
                 amis()->CRUDTable()
@@ -449,7 +491,7 @@ class StudentController extends AdminController
                     ->affixHeader(false)
                     ->filterTogglable()
                     ->filterDefaultVisible(false)
-                    ->bulkActions([$this->bulkDeleteButton()])
+                    ->bulkActions([$bulkDeleteButton])
                     ->perPageAvailable([10, 20, 30, 50, 100, 200])
                     ->footerToolbar(['switch-per-page', 'statistics', 'pagination'])
                     ->api(admin_url('biz/school/classes?_action=getData'))
@@ -489,7 +531,7 @@ class StudentController extends AdminController
                             ->set('options',['1' => '是', '0' => '否']),
                         amis()->Operation()->label(__('admin.actions'))->buttons([
                             $editButton,
-                            $this->rowDeleteButton(),
+                            $deleteButton,
                         ])->set('width', 150),
                     ])
             )

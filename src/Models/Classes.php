@@ -2,6 +2,7 @@
 
 namespace DagaSmart\School\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
@@ -28,5 +29,6 @@ class Classes extends Model
             'id'
         );
     }
+
 
 }

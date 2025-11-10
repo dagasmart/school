@@ -26,7 +26,13 @@ class SchoolGradeClassesStudent extends Model
     protected static function booted(): void
     {
         static::addGlobalScope(ActiveScope::class, function ($query) {
-            $query->whereHas('base');
+            $query->whereHas('base')
+                ->when(admin_current_module(), function ($query) {
+                    $query->where('module', admin_current_module());
+                })
+                ->when(admin_mer_id(), function ($query) {
+                    $query->where('mer_id', admin_mer_id());
+                });
         });
     }
 
