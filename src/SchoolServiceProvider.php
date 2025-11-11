@@ -46,6 +46,13 @@ class SchoolServiceProvider extends ServiceProvider
             'url_type' => 1,
             'icon' => 'heroicons:building-office-2',
         ],
+        [
+            'parent' => '基础维护',
+            'title' => '设备管理',
+            'url' => '/biz/school/device',
+            'url_type' => 1,
+            'icon' => 'ph:devices-light',
+        ],
 
     ];
 

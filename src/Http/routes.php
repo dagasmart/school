@@ -12,10 +12,12 @@ Route::group([
     $router->resource('school/student', Controllers\StudentController::class);
     $router->resource('school/classes', Controllers\ClassesController::class);
     $router->resource('school/facility', Controllers\FacilityController::class);
+    $router->resource('school/device', Controllers\DeviceController::class);
 
     $router->get('school/{school_id}/grade', [Controllers\GradeController::class, 'SchoolGrade']);
     $router->get('school/{school_id}/grade/{grade_id}/classes', [Controllers\ClassesController::class, 'SchoolGradeClasses']);
     $router->get('school/teacher/{id_card}/check', [Controllers\TeacherController::class, 'SchoolTeacherCheck']);
+    $router->get('school/{school_id}/facility/options', [Controllers\FacilityController::class, 'options']);
     $router->get('school/{school_id}/facility/{id}/options', [Controllers\FacilityController::class, 'options']);
 
 });
