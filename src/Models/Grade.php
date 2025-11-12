@@ -4,7 +4,7 @@ namespace DagaSmart\School\Models;
 
 
 /**
- * 基础-年级表
+ * 基础-年级类
  */
 class Grade extends Model
 {

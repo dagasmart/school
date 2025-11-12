@@ -23,7 +23,7 @@ use function Laravel\Prompts\error;
 use function Swow\Utils\success;
 
 /**
- * 基础-老师表
+ * 基础-老师类
  *
  * @property TeacherService $service
  */

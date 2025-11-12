@@ -6,7 +6,7 @@ use DagaSmart\BizAdmin\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
- * 基础-学校-年级-班级关联表
+ * 基础-学校-年级-班级关联模型类
  */
 class SchoolGradeClasses extends Model
 {

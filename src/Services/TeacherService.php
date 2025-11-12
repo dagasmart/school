@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 
 /**
- * 基础-学生表
+ * 基础-老师服务类
  *
  * @method Teacher getModel()
  * @method Teacher|Builder query()

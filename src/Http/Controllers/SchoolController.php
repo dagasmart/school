@@ -10,7 +10,7 @@ use DagaSmart\BizAdmin\Renderers\Page;
 use DagaSmart\BizAdmin\Support\Cores\AdminPipeline;
 
 /**
- * 基础-学校表
+ * 基础-学校类
  *
  * @property SchoolService $service
  */

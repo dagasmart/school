@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 
 /**
- * 基础-学生表
+ * 基础-班级服务类
  *
  * @method Classes getModel()
  * @method Classes|Builder query()

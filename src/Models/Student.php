@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\hasOne;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * 基础-学生表
+ * 基础-学生表模型
  */
 class Student extends Model
 {

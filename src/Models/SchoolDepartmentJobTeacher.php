@@ -6,7 +6,7 @@ use DagaSmart\BizAdmin\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
- * 基础-老师-职务表
+ * 基础-老师-职务模型类
  */
 class SchoolDepartmentJobTeacher extends Model
 {

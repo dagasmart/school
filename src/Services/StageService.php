@@ -7,7 +7,7 @@ use DagaSmart\School\Models\Stage;
 
 
 /**
- * 基础-学校表
+ * 基础-学段服务类
  *
  * @method Stage getModel()
  * @method Stage|Builder query()

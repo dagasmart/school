@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 
 /**
- * 基础-学生表
+ * 基础-设备服务类
  *
  * @method Device getModel()
  * @method Device|Builder query()

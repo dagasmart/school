@@ -9,7 +9,7 @@ use DagaSmart\BizAdmin\Renderers\Page;
 
 
 /**
- * 基础-班级表
+ * 基础-设备类
  *
  * @property DeviceService $service
  */

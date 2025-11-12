@@ -5,7 +5,7 @@ namespace DagaSmart\School\Models;
 use DagaSmart\School\Enums\Enum;
 
 /**
- * 基础-职务表
+ * 基础-职务类
  */
 class Job extends Model
 {

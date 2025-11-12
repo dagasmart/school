@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
- * 基础-学生表
+ * 基础-班级类
  */
 class Classes extends Model
 {

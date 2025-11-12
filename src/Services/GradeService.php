@@ -7,7 +7,7 @@ use DagaSmart\School\Models\School;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * 基础-学校表
+ * 基础-年级服务类
  *
  * @method Grade getModel()
  * @method Grade|Builder query()

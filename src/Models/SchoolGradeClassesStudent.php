@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\hasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
- * 基础-学校-年级-班级-学生-关联类
+ * 基础-学校-年级-班级-学生-关联模型类
  */
 class SchoolGradeClassesStudent extends Model
 {

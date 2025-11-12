@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 
 /**
- * 基础-学生表
+ * 基础-设施服务类
  *
  * @method Facility getModel()
  * @method Facility|Builder query()

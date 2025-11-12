@@ -9,7 +9,7 @@ use DagaSmart\BizAdmin\Renderers\Form;
 use DagaSmart\BizAdmin\Renderers\Page;
 
 /**
- * 基础-班级表
+ * 基础-班级类
  *
  * @property ClassesService $service
  */

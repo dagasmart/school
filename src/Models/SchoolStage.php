@@ -3,7 +3,7 @@
 namespace DagaSmart\School\Models;
 
 /**
- * 基础-学段模型
+ * 基础-学段模型类
  */
 class SchoolStage extends Model
 {

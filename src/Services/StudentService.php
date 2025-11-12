@@ -9,7 +9,7 @@ use DagaSmart\School\Models\SchoolGradeClassesStudent;
 use DagaSmart\School\Models\Student;
 use Illuminate\Database\Eloquent\Builder;
 /**
- * 基础-学生表
+ * 基础-学生服务类
  *
  * @method Student getModel()
  * @method Student|Builder query()

@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 
 /**
- * 基础-学生表
+ * 基础-老师模型类
  */
 class Teacher extends Model
 {

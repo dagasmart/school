@@ -5,7 +5,7 @@ namespace DagaSmart\School\Models;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
- * 基础-学生表
+ * 基础-设施类
  */
 class Facility extends Model
 {
