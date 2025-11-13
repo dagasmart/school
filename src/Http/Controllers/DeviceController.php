@@ -55,9 +55,10 @@ class DeviceController extends AdminController
                         'multiple' => true,
                         'options' => $this->service->options(),
                     ])
-                    ->set('type', 'tree-select')
+                    ->set('type', 'tpl')
                     ->set('options', $this->service->options())
                     ->set('value', '${rel.facility.id}')
+                    ->set('enableNodePath', true)
                     ->set('static', true)
                     ->width(150),
                 amis()->TableColumn('device_sn','设备编号')
@@ -96,6 +97,7 @@ class DeviceController extends AdminController
                 ->options($this->service->options())
                 ->value('${rel.facility.id}')
                 ->disabledOn('${!school_id}')
+                ->onlyLeaf()
                 ->searchable()
                 ->clearable()
                 ->required(),
