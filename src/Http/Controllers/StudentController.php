@@ -516,8 +516,8 @@ class StudentController extends AdminController
                                 ->size('sm'),
                             amis()->CheckboxesControl('status','状态')
                                 ->options([
-                                    '1' => '是',
-                                    '0' => '否',
+                                    '1' => '开启',
+                                    '0' => '禁用',
                                 ]),
                         ])
                     )
@@ -528,7 +528,7 @@ class StudentController extends AdminController
                         amis()->TableColumn('rel.school.school_name', '学校'),
                         amis()->TableColumn('status','状态')
                             ->set('type','status')
-                            ->set('options',['1' => '是', '0' => '否']),
+                            ->set('options',['1' => '开启', '0' => '禁用']),
                         amis()->Operation()->label(__('admin.actions'))->buttons([
                             $editButton,
                             $deleteButton,
