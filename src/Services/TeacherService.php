@@ -178,6 +178,7 @@ class TeacherService extends AdminService
      */
     public function getJobAll(): array
     {
+        //Job::initialize();
         $list = Job::query()
             ->select(admin_raw('*, job_name as label, id as value'))
             ->orderBy('sort')

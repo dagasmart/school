@@ -21,26 +21,27 @@ class Job extends Model
      */
     public static function initialize(): void
     {
-        $id = Job::query()->forceDelete();
-        $jobs = Enum::job();
-        foreach ($jobs as $k => $job) {
-            $data = [
-                'id' => $k+1,
-                'job_name' => $job['label'],
-                'tag' => $job['tag'],
-                'parent_id' => 0,
-                'sort' => $k++,
-            ];
-            $id = Job::query()->insertGetId($data);
-            foreach ($job['children'] as $child) {
-                $ins = [
-                    'id' => $child['value'],
-                    'job_name' => $child['label'],
-                    'tag' => $child['tag'],
-                    'parent_id' => $id,
-                    'sort' => $k++
+        static::query()->truncate();
+        if ($jobs = Enum::job()) {
+            foreach ($jobs as $k => $job) {
+                $data = [
+                    'id' => $k + 1,
+                    'job_name' => $job['label'],
+                    'tag' => $job['tag'],
+                    'parent_id' => 0,
+                    'sort' => $k++,
                 ];
-                Job::query()->insert($ins);
+                $id = Job::query()->insertGetId($data);
+                foreach ($job['children'] as $child) {
+                    $ins = [
+                        'id' => $child['value'],
+                        'job_name' => $child['label'],
+                        'tag' => $child['tag'],
+                        'parent_id' => $id,
+                        'sort' => $k++
+                    ];
+                    Job::query()->insert($ins);
+                }
             }
         }
     }
